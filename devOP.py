@@ -31,7 +31,7 @@ class App():
 	def validaPet(pet):
 		res=True
 		for i in pet:
-			if( (i!="s") and (i != "n") ):
+			if( (i!="s") and (i != "n")):
 				res=False
 				break
 		return res
@@ -66,28 +66,26 @@ class preprocesado:
 
 	def gestionaProcesado(java,maven):
 		if(java == "s"):
-			print("Instalando Java")
+			print("Instalando Java JDK 1.8.0_171")
 			preprocesado.javaInstall()
 			print("[OK] Instalación Java finalizada")
 		if(maven == "s"):
-			print("Instalando Maven ... ")
+			print("Instalando Maven 3.5.3 ")
 			preprocesado.mavenInstall()
 			print("[OK] Instalación Maven finalizada")
 
 	def javaInstall():
 		os.system("mkdir /usr/java")
-		os.system("tar -zxvf  utilidades/jre-10.0.1_linux-x64_bin.tar.gz")
-		os.system("mv jre-10.0.1 /usr/java")
-		os.system("export JAVA_HOME=/usr/java/jre-10.0.1")
-		os.system("export PATH=$PATH:/usr/java/jre-10.0.1/bin")
-
+		os.system("tar -zxvf  utilidades/jdk-8u171-linux-i586.tar.gz")
+		os.system("mv jdk1.8.0_171 /usr/java")
+		os.system("cp utilidades/java.sh /etc/profile.d")
+		os.system("source /etc/profile.d/java.sh")
 
 	def mavenInstall():
 		os.system("tar -zxvf utilidades/apache-maven-3.5.3-bin.tar.gz")
 		os.system("mv apache-maven-3.5.3 /opt/apache-maven-3.5.3")
-		m1="export MAVEN_HOME=/opt/apache-maven-3.5.3"
-		m2="export M2_HOME=/opt/apache-maven-3.5.3"
-		m3="export PATH=$PATH:$M2_HOME/bin"
+		os.system("cp utilidades/maven.sh /etc/profile.d/")
+		os.system("source /etc/profile.d/maven.sh")
 
 # -- fin clases --
 
