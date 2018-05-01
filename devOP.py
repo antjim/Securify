@@ -19,10 +19,11 @@ class App():
 
 		pre=input("¿Desea realizar el procesado? s/n: ")
 		if(pre=="s" or pre==''):
-			preprocesado.Menu()
+			preprocesado.Menu()			
+			input("Presiona [Enter] para continuar")
 
 		while(menu):
-			print("herramientas ...")
+			os.system("clear")
 			contramedidas.Menu()
 			break
 				#print("Instalando JAVA - jre 1.8.0_171")
@@ -42,27 +43,34 @@ class App():
 class preprocesado:
 
 	def Menu():
-		obj=[]
-		java=input("¿instalar java con sus respectivas variables? s/n: ")
-		obj.append(java)
-		maven=input("¿Descargar maven y configurarlo? s/n: ")
-		obj.append(maven)
+		menu=True
 		
-		os.system("clear")
-		print("Parámetros de configuración seleccionados: Java ["+java+"]"+", "+"Maven ["+maven+"]")
-		continuar=input("¿Continuar con configuración seleccionada? s/n: ")
+		while(menu):
+			obj=[]
+			java=input("¿instalar java con sus respectivas variables? s/n: ")
+			obj.append(java)
+			maven=input("¿Descargar maven y configurarlo? s/n: ")
+			obj.append(maven)
 		
-		obj.append(continuar)
-		if(App.validaPet(obj)):
+			os.system("clear")
+			print("Parámetros de configuración seleccionados: Java ["+java+"]"+", "+"Maven ["+maven+"]")
+			continuar=input("¿Continuar con configuración seleccionada? s/n: ")
+		
+			obj.append(continuar)
+			if(App.validaPet(obj)):
 			
-			if(continuar=="s" or continuar==''):
-				preprocesado.gestionaProcesado(java,maven)
-			else:
-				print("Procesado inicial cancelado.")
+				if(continuar=="s" or continuar==''):
+					preprocesado.gestionaProcesado(java,maven)
+					menu=False
+				else:
+					print("Procesado inicial cancelado.")
+					q=input("¿Desea salid del menu preprocesado? s/n: ")
+					if(q=="s" or q==''):
+						menu=False
 
-		else:
-			print("Por favor use 's'/'INTRO' o 'n'  para seleccionar la correspondiente acción")
-			print("Volviendo al menu principal ...")
+			else:
+				print("Por favor use 's'/'INTRO' o 'n'  para seleccionar la correspondiente acción")
+				print("Volviendo al menu preprocesado ...")
 
 
 	def gestionaProcesado(java,maven):
@@ -92,30 +100,28 @@ class preprocesado:
 class contramedidas:
 	
 	def Menu():
-		obj=[]
-		cert=input("¿Generar certificados? s/n: ")
-		obj.append(cert)
-		
-		kerberos=input("¿Instalar servidor de Kerberos? s/n: ")
-		obj.append(kerberos)
-		
-		ranger=input("¿Instalar Apache Ranger? s/n: ")
-		obj.append(ranger)
+		menu=True
 
-		os.system("clear")
-		print("Parámetros de configuración seleccionados: Certificados ["+cert+"]"+", "+"Kerberos ["+kerberos+"], Apache Ranger["+ranger+"]")
-		continuar=input("¿Continuar con configuración seleccionada? s/n: ")
+		while(menu):
+			print(" ")
+			print("1) Mejorar Integridad")
+			print("2) Mejorar Autorización / Autenticación")
+			print("3) Mejorar Anonimidad")
+			print("4) Salir")
+			print(" ")
+			qm=input("Seleccionar una de las opciones: ")
+			
+			if(qm=="1"):
+				contramedidas.gestionIntegridad()
 
-		obj.append(continuar)
-		if(App.validaPet(obj)):
-			if(continuar=="s" or continuar==''):
-				contramedidas.gestionaContramedidas(cert,kerberos,ranger)
+			elif(qm=="2"):
+				contramedidas.gestionAu()
+		
+			elif(qm=="3"):
+				contramedidas.gestionAn()
+
 			else:
-				print("Contramedidas canceladas.")
-	
-		else:
-			print("[ERROR] Por favor use 's'/'INTRO' o 'n' para seleccionar la correspondiente acción")
-			print("Volviendo al menu principal ...")
+				menu=False
 
 
 	def gestionaContramedidas(cert,kerberos,ranger):
@@ -142,13 +148,13 @@ class contramedidas:
 
 		def systemK():
 			try:
-				subprocess.call(['apt-get'])
-				os.system("apt-get -y install krb5-kdc krb5-admin-server")
+				subprocess.call(['apt-get','install','krb5-kdc','krb5-admin-server'])
+				#os.system("apt-get -y install krb5-kdc krb5-admin-server")
 
 			except OSError:
 				try:
-					subprocess.call(['yum'])
-					os.system("yum -y install krb5-kdc krb5-admin-server")
+					subprocess.call(['yum','-y','install','krb5-kdc','krb5-admin-server'])
+					#os.system("yum -y install krb5-kdc krb5-admin-server")
 				except OSError:
 					print("[Error] Sistema operativo soportado para Debian, derivados y CentOS")
 		systemK()
@@ -159,6 +165,74 @@ class contramedidas:
 	def Ranger():
 		print("COOKING")
 
+
+	def gestionIntegridad():
+		obj=[]
+		cert=input("¿Generar certificados? s/n: ")
+		obj.append(cert)
+
+		os.system("clear")
+		print("Parámetros de configuración seleccionados: Certificados ["+cert+"]")
+		continuar=input("¿Continuar con configuración seleccionada? s/n: ")
+
+		obj.append(continuar)
+		if(App.validaPet(obj)):
+			if(continuar=="s" or continuar==''):
+				contramedidas.gestionaContramedidas(cert,'n','n')	#evitar replicas constantes.
+			else:
+				print("Parametros de Integridad canceladas.")
+				q=input("¿Salir del menu de integridad? s/n: ")
+
+				if(q=="n"):
+					contramedidas.gestionIntegridad()
+
+		else:
+			print("[ERROR] Por favor use 's'/'INTRO' o 'n' para seleccionar la correspondiente acción")
+			print("Volviendo al menu principal ...")
+
+
+	def gestionAu():
+		obj=[]
+		kerberos=input("¿Instalar servidor de Kerberos? s/n: ")
+		obj.append(kerberos)
+
+		ranger=input("¿Instalar Apache Ranger? s/n: ")
+		obj.append(ranger)
+
+		os.system("clear")
+		print("Parámetros de configuración seleccionados: Kerberos ["+kerberos+"], Apache Ranger["+ranger+"]")
+		continuar=input("¿Continuar con configuración seleccionada? s/n: ")
+
+		obj.append(continuar)
+		if(App.validaPet(obj)):
+			if(continuar=="s" or continuar==''):
+				contramedidas.gestionaContramedidas('n',kerberos,ranger)
+			else:
+				print("Contramedidas de Autorización / Autenticación canceladas.")
+
+		else:
+			print("[ERROR] Por favor use 's'/'INTRO' o 'n' para seleccionar la correspondiente acción")
+			print("Volviendo al menu principal ...")
+
+
+	def gestionAn():
+		obj=[]
+		kerberos=input("¿Instalar servidor de Kerberos? s/n: ")
+		obj.append(kerberos)
+
+		os.system("clear")
+		print("Parámetros de configuración seleccionados: Kerberos ["+kerberos+"]")
+		continuar=input("¿Continuar con configuración seleccionada? s/n: ")
+
+		if(App.validaPet(obj)):
+			if(continuar=="s" or continuar==''):
+				contramedidas.gestionaContramedidas('n',kerberos,'n')
+			else:
+				print("Contramedidas de anonimato canceladas.")
+
+		else:
+			print("[ERROR] Por favor use 's'/'INTRO' o 'n' para seleccionar la correspondiente acción")
+			print("Volviendo al menu principal ...")
 
 
 # -- fin clases --
