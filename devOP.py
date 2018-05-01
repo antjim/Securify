@@ -87,6 +87,65 @@ class preprocesado:
 		os.system("cp utilidades/maven.sh /etc/profile.d/")
 		os.system("source /etc/profile.d/maven.sh")
 
+
+class contramedidas:
+	
+	def Menu:
+		obj=[]
+		cert=input("¿Generar certificados? s/n: ")
+		obj.append(cert)
+		
+		kerberos=input("¿Instalar servidor de Kerberos? s/n: ")
+		obj.append(kerberos)
+		
+		ranger=input("¿Instalar Apache Ranger? s/n: ")
+		obj.append(ranger)
+
+		os.system("clear")
+                print("Parámetros de configuración seleccionados: Certificados ["+cert+"]"+", "+"Kerberos ["+kerberos+"], Apache Ranger["+ranger+"]")
+                continuar=input("¿Continuar con configuración seleccionada? s/n: ")
+
+		obj.append(continuar)
+		if(App.validaPet(obj)):
+
+                        if(continuar=="s"):
+                                contramedidas.gestionaContramedidas(java,maven)
+                        else:
+                                print("Contramedidas canceladas.")
+
+                else:
+                        print("[ERROR] Por favor use 's' o 'n' para seleccionar la correspondiente acción")
+                        print("Volviendo al menu principal ...")
+
+
+	def gestionaContramedidas(cert,kerberos,ranger):
+		if(cert == "s"):
+                        print("Generando certificados")
+                        contramedidas.Certificados()
+                        print("[OK] Generación de certificados finalizada")
+
+                if(kerberos == "s"):
+                        print("Instalando Maven 3.5.3 ")
+                        preprocesado.mavenInstall()
+                        print("[OK] Instalación Maven finalizada")
+
+		if(ranger == "s"):
+                        print("Instalando Maven 3.5.3 ")
+                        preprocesado.mavenInstall()
+                        print("[OK] Instalación Maven finalizada")
+
+
+	def Certificados():
+		os.system("bash utilidades/cert.sh")
+
+	def Kerberos():
+		print("COOKING")
+
+	def Ranger():
+		print("COOKING")
+
+
+
 # -- fin clases --
 
 
