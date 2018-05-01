@@ -18,11 +18,12 @@ class App():
 		menu=True
 
 		pre=input("¿Desea realizar el procesado? s/n: ")
-		if(pre=="s"):
+		if(pre=="s" or pre==''):
 			preprocesado.Menu()
 
 		while(menu):
 			print("herramientas ...")
+			contramedidas.Menu()
 			break
 				#print("Instalando JAVA - jre 1.8.0_171")
 				#preprocesado.javaInstall()
@@ -31,7 +32,7 @@ class App():
 	def validaPet(pet):
 		res=True
 		for i in pet:
-			if( (i!="s") and (i != "n")):
+			if( (i!="s") and (i != "n") and (i != '')):
 				res=False
 				break
 		return res
@@ -54,13 +55,13 @@ class preprocesado:
 		obj.append(continuar)
 		if(App.validaPet(obj)):
 			
-			if(continuar=="s"):
+			if(continuar=="s" or continuar==''):
 				preprocesado.gestionaProcesado(java,maven)
 			else:
 				print("Procesado inicial cancelado.")
 
 		else:
-			print("Por favor use 's' o 'n' para seleccionar la correspondiente acción")
+			print("Por favor use 's'/'INTRO' o 'n'  para seleccionar la correspondiente acción")
 			print("Volviendo al menu principal ...")
 
 
@@ -84,7 +85,7 @@ class preprocesado:
 	def mavenInstall():
 		os.system("tar -zxvf utilidades/apache-maven-3.5.3-bin.tar.gz")
 		os.system("mv apache-maven-3.5.3 /opt/apache-maven-3.5.3")
-		os.system("cp utilidades/maven.sh /etc/profile.d/")
+		os.system("cp utilidades/maven.sh /etc/profile.d")
 		os.system("source /etc/profile.d/maven.sh")
 
 
@@ -107,39 +108,54 @@ class contramedidas:
 
 		obj.append(continuar)
 		if(App.validaPet(obj)):
-			if(continuar=="s"):
-				contramedidas.gestionaContramedidas(java,maven)
+			if(continuar=="s" or continuar==''):
+				contramedidas.gestionaContramedidas(cert,kerberos,ranger)
 			else:
 				print("Contramedidas canceladas.")
 	
 		else:
-			print("[ERROR] Por favor use 's' o 'n' para seleccionar la correspondiente acción")
+			print("[ERROR] Por favor use 's'/'INTRO' o 'n' para seleccionar la correspondiente acción")
 			print("Volviendo al menu principal ...")
 
 
 	def gestionaContramedidas(cert,kerberos,ranger):
-		if(cert == "s"):
+		if(cert == "s" or cert==''):
 			print("Generando certificados")
 			contramedidas.Certificados()
 			print("[OK] Generación de certificados finalizada")
 		
-		if(kerberos == "s"):
-			print("Instalando Maven 3.5.3 ")
-			preprocesado.mavenInstall()
-			print("[OK] Instalación Maven finalizada")
+		if(kerberos == "s" or kerberos==''):
+			print("Instalando Kerberos ")
+			contramedidas.Kerberos()
+			print("[OK] Instalación del servidor Kerberos finalizada.")
 
-		if(ranger == "s"):
-			print("Instalando Maven 3.5.3 ")
-			preprocesado.mavenInstall()
-			print("[OK] Instalación Maven finalizada")
+		if(ranger == "s" or ranger==''):
+			print("Instalando Apache Ranger ")
+			contramedidas.Ranger()
+			print("[OK] Instalación de Apacha Ranger finalizada")
 
 
 	def Certificados():
 		os.system("bash utilidades/cert.sh")
 
 	def Kerberos():
-		print("COOKING")
 
+		def systemK():
+			try:
+				subprocess.call(['apt-get'])
+				os.system("apt-get -y install krb5-kdc krb5-admin-server")
+
+			except OSError:
+				try:
+					subprocess.call(['yum'])
+					os.system("yum -y install krb5-kdc krb5-admin-server")
+				except OSError:
+					print("[Error] Sistema operativo soportado para Debian, derivados y CentOS")
+		systemK()
+
+		#configuración ...
+		
+		# ---
 	def Ranger():
 		print("COOKING")
 
