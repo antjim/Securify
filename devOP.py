@@ -41,13 +41,13 @@ class App():
 	def System():
 		
 		try:
-			subprocess.call(['apt-get'])
+			os.popen('apt-get').read()
 			return True	#debian y derivados.
 
 		except OSError:
 			try:
-				subprocess.call(['yum'])	#CentOS y derivados
-				return False                                        #os.system("yum -y install krb5-kdc krb5-admin-server")
+				os.popen('yum').read()	#CentOS y derivados
+				return False
 			except OSError:
 				print("[Error] Sistema operativo soportado para Debian, derivados y CentOS")
 
@@ -197,9 +197,8 @@ class contramedidas:
 			os.system("mkdir dev")
 			os.system("git clone https://github.com/apache/incubator-ranger.git")
 			os.system("mv incubator-ranger dev")
-			os.system("cd dev/incubator-ranger")
 			#interesante comprobar mvn antes??
-			os.system("mvn clean compile package assembly:assembly install")
+			os.system("cd dev/incubator-ranger && mvn clean compile package assembly:assembly install")
 
 
 		print("PREPARANDO ENTORNO")
