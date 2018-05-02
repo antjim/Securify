@@ -38,6 +38,19 @@ class App():
 				break
 		return res
 
+	def System():
+		
+		try:
+			subprocess.call(['apt-get'])
+			return True	#debian y derivados.
+
+		except OSError:
+			try:
+				subprocess.call(['yum'])	#CentOS y derivados
+				return False                                        #os.system("yum -y install krb5-kdc krb5-admin-server")
+			except OSError:
+				print("[Error] Sistema operativo soportado para Debian, derivados y CentOS")
+
 
 
 class preprocesado:
@@ -58,7 +71,7 @@ class preprocesado:
 		
 			obj.append(continuar)
 			if(App.validaPet(obj)):
-			
+				obj=[]
 				if(continuar=="s" or continuar==''):
 					preprocesado.gestionaProcesado(java,maven)
 					menu=False
@@ -144,7 +157,7 @@ class contramedidas:
 	def Certificados():
 		os.system("bash utilidades/cert.sh")
 
-	def Kerberos():
+	def Kerberos():	#COOKING
 
 		def systemK():
 			try:
@@ -163,7 +176,46 @@ class contramedidas:
 		
 		# ---
 	def Ranger():
-		print("COOKING")
+
+		def entornoRangerC():
+			#ideal tratamiento recogidos en un log ...
+			os.system("yum -y install gcc")
+			
+			#mysql
+			os.system("wget https://dev.mysql.com/get/mysql80-community-release-el7-1.noarch.rpm")
+			os.system("yum repolist all | grep mysql")
+			os.system("yum repolist enabled | grep mysql")
+			os.system("sudo yum -y install mysql-community-server")
+			os.system("service mysqld start")
+			#fin mysql ---
+
+		def entornoRangerD():
+			os.system("apt-get -y install gcc")
+			os.system("apt-get -y install mysql-server")
+
+		def compilaRanger():
+			os.system("mkdir dev")
+			os.system("git clone https://github.com/apache/incubator-ranger.git")
+			os.system("mv incubator-ranger dev")
+			os.system("cd dev/incubator-ranger")
+			#interesante comprobar mvn antes??
+			os.system("mvn clean compile package assembly:assembly install")
+
+
+		print("PREPARANDO ENTORNO")
+		entorno=App.System()
+
+		if(entorno):
+			entornoRangerD()
+		
+		elif(entorno==False):
+			entornoRangerC()
+
+		print("COMPILANDO APACHE RANGER")
+
+		compilaRanger()
+
+		print("INSTALANDO RANGER")
 
 
 	def gestionIntegridad():
@@ -177,6 +229,7 @@ class contramedidas:
 
 		obj.append(continuar)
 		if(App.validaPet(obj)):
+
 			if(continuar=="s" or continuar==''):
 				contramedidas.gestionaContramedidas(cert,'n','n')	#evitar replicas constantes.
 			else:
