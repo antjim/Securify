@@ -16,11 +16,11 @@ class App():
 
 	def run(self):
 		menu=True
-
-		pre=input("¿Desea realizar el procesado? s/n: ")
-		if(pre=="s" or pre==''):
-			preprocesado.Menu()			
-			input("Presiona [Enter] para continuar")
+		
+	#	pre=input("¿Desea realizar el procesado? s/n: ")
+		#if(pre=="s" or pre==''):
+		preprocesado.Menu()			
+		input("Presiona [Enter] para continuar")
 
 		while(menu):
 			os.system("clear")
@@ -33,7 +33,7 @@ class App():
 	def validaPet(pet):
 		res=True
 		for i in pet:
-			if( (i!="s") and (i != "n") and (i != '')):
+			if( (i!="s") and (i != "n") and (i != '') and (i != True) and (i != False) ):
 				res=False
 				break
 		return res
@@ -59,21 +59,47 @@ class preprocesado:
 		menu=True
 		
 		while(menu):
-			obj=[]
-			java=input("¿instalar java con sus respectivas variables? s/n: ")
-			obj.append(java)
-			maven=input("¿Descargar maven y configurarlo? s/n: ")
-			obj.append(maven)
+			s=App.System()
+
+			if(s):
+				qjk=os.popen("dpkg -l | grep openjdk-8-jdk").read()
+				qje=os.popen("dpkg -l | grep openjdk-8-jre").read()
+				qm=os.popen("dpkg -l | grep maven").read()
+
+			else:
+				qjk=os.popen("rpm -qa | grep java-1.8.0-openjdk").read()
+				qje=os.popen("rpm -qa | grep  java-1.8.0-openjdk").read()
+				qm=os.popen("rpm -qa | grep maven").read()
+
+			obj={}
+			obj["Java - JDK"]= qjk==''
+			obj["Java - JRE"]= qje==''
+			obj["Apache Maven"]= qm==''	#False -> el paquete existe / True -> el paquete no está instalado
+			
+			if(True in obj.values()):
+				l=[]
+				cont=1
+				for i in obj:
+					if(obj[i]):
+						l.append(i)
+						cont+=1
+
+				if(cont>1):
+					print("Paquetes necesarios: ",l)
+					continuar=input("Desea instalar los paquetes necesarios? s/n: ")
+				else:
+					print("Paquete necesario: "+l[0])
+					continuar=input("¿Desea instalar el paquete necesario? s/n: ")
 		
-			os.system("clear")
-			print("Parámetros de configuración seleccionados: Java ["+java+"]"+", "+"Maven ["+maven+"]")
-			continuar=input("¿Continuar con configuración seleccionada? s/n: ")
-		
-			obj.append(continuar)
-			if(App.validaPet(obj)):
-				obj=[]
+			obj2=[]
+			obj2.append(continuar)
+			if(App.validaPet(obj2)):
+				obj2=[]
 				if(continuar=="s" or continuar==''):
-					preprocesado.gestionaProcesado(java,maven)
+					preprocesado.javaInstall(qjk,qje)
+					
+					if(qm):
+						preprocesado.mavenInstall()
 					menu=False
 				else:
 					print("Procesado inicial cancelado.")
@@ -86,28 +112,38 @@ class preprocesado:
 				print("Volviendo al menu preprocesado ...")
 
 
-	def gestionaProcesado(java,maven):
-		if(java == "s"):
-			print("Instalando Java JDK 1.8.0_171")
-			preprocesado.javaInstall()
-			print("[OK] Instalación Java finalizada")
-		if(maven == "s"):
-			print("Instalando Maven 3.5.3 ")
-			preprocesado.mavenInstall()
-			print("[OK] Instalación Maven finalizada")
 
-	def javaInstall():
-		os.system("mkdir /usr/java")
-		#os.system("tar -zxvf  utilidades/jdk-8u171-linux-i586.tar.gz")
-		os.system("cp -r utilidades/jdk1.8.0_171 /usr/java")
-		os.system("cp utilidades/java.sh /etc/profile.d")
-		os.system("source /etc/profile.d/java.sh")
+	def javaInstall(jdk,jre):
+		s=App.System()
+
+		if(s):
+			if(jdk):
+				os.system("apt-get -y install openjdk-8-jdk")
+			elif(jre):
+				os.system("apt-get -y install openjdk-8-jre")
+		else:
+			if(jdk):
+				os.system("yum install java-1.8.0-openjdk-devel")
+			elif(jre):
+				os.system("yum -y install java-1.8.0-openjdk")
+		
+		#os.system("mkdir /usr/java")
+		#os.system("cp -r utilidades/jdk1.8.0_171 /usr/java")
+		#os.system("cp utilidades/java.sh /etc/profile.d")
+		#os.system("source /etc/profile.d/java.sh")
 
 	def mavenInstall():
-		os.system("tar -zxvf utilidades/apache-maven-3.5.3-bin.tar.gz")
-		os.system("mv apache-maven-3.5.3 /opt/apache-maven-3.5.3")
-		os.system("cp utilidades/maven.sh /etc/profile.d")
-		os.system("source /etc/profile.d/maven.sh")
+		s=App.System()
+		
+		if(s):
+			os.system("apt-get -y install maven")
+		else:
+			os.system("yum -y install maven")
+
+		#os.system("tar -zxvf utilidades/apache-maven-3.5.3-bin.tar.gz")
+		#os.system("mv apache-maven-3.5.3 /opt/apache-maven-3.5.3")
+		#os.system("cp utilidades/maven.sh /etc/profile.d")
+		#os.system("source /etc/profile.d/maven.sh")
 
 
 class contramedidas:
