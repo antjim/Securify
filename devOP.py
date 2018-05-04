@@ -16,19 +16,13 @@ class App():
 
 	def run(self):
 		menu=True
-		
-	#	pre=input("¿Desea realizar el procesado? s/n: ")
-		#if(pre=="s" or pre==''):
-		preprocesado.Menu()			
-		input("Presiona [Enter] para continuar")
+
+		preprocesado.Menu()
 
 		while(menu):
 			os.system("clear")
 			contramedidas.Menu()
 			break
-				#print("Instalando JAVA - jre 1.8.0_171")
-				#preprocesado.javaInstall()
-				#print("[OK] Instalación de Java finalizada.")
 
 	def validaPet(pet):
 		res=True
@@ -90,41 +84,43 @@ class preprocesado:
 				else:
 					print("Paquete necesario: "+l[0])
 					continuar=input("¿Desea instalar el paquete necesario? s/n: ")
-		
-			obj2=[]
-			obj2.append(continuar)
-			if(App.validaPet(obj2)):
+
 				obj2=[]
-				if(continuar=="s" or continuar==''):
-					preprocesado.javaInstall(qjk,qje)
+				obj2.append(continuar)
+				if(App.validaPet(obj2)):
+					obj2=[]
+					if(continuar=="s" or continuar==''):
+						preprocesado.javaInstall(qjk,qje)
 					
-					if(qm):
-						preprocesado.mavenInstall()
-					menu=False
-				else:
-					print("Procesado inicial cancelado.")
-					q=input("¿Desea salid del menu preprocesado? s/n: ")
-					if(q=="s" or q==''):
+						if(qm==''):
+							preprocesado.mavenInstall()
 						menu=False
+						input("Presiona [ENTER] para continuar.")
+					else:
+						print("Procesado inicial cancelado.")
+						q=input("¿Desea salid del menu preprocesado? s/n: ")
+						if(q=="s" or q==''):
+							menu=False
 
+				else:
+					print("Por favor use 's'/'INTRO' o 'n'  para seleccionar la correspondiente acción")
+					print("Volviendo al menu preprocesado ...")
 			else:
-				print("Por favor use 's'/'INTRO' o 'n'  para seleccionar la correspondiente acción")
-				print("Volviendo al menu preprocesado ...")
-
+				menu=False
 
 
 	def javaInstall(jdk,jre):
 		s=App.System()
 
 		if(s):
-			if(jdk):
+			if(jdk==''):
 				os.system("apt-get -y install openjdk-8-jdk")
-			elif(jre):
+			elif(jre==''):
 				os.system("apt-get -y install openjdk-8-jre")
 		else:
-			if(jdk):
+			if(jdk==''):
 				os.system("yum install java-1.8.0-openjdk-devel")
-			elif(jre):
+			elif(jre==''):
 				os.system("yum -y install java-1.8.0-openjdk")
 		
 		#os.system("mkdir /usr/java")
