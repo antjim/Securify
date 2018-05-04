@@ -8,23 +8,34 @@ DIR=/home/ssl
 mkdir /home/ssl
 fi
 
+echo " ---------- "
+
 echo "Alias del almacén (intro para establecer por defecto como localhost): "
 read "ALIAS"
+
+echo " ---------- "
 
 if [ "$ALIAS" = "" ]; then
 ALIAS="localhost"
 fi
 
+echo " ---------- "
 
-echo "Clave para el certificado: "
+echo "Clave para el certificado (CUIDADO CON LAS CLAVES QUE SE SOLICITEN EN LA CREACIÓN DEL CERTIFICADO): "
 read "CLAVE"
+
+echo " ---------- "
 
 echo "Duración en días del certificado (intro para establecer por defecto como 365 días): "
 read "DIAS"
 
+echo " ---------- "
+
 if [ "$DIAS" = "" ]; then
 DIAS=365
 fi
+
+echo " ---------- "
 
 
 

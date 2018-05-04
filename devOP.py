@@ -121,7 +121,7 @@ class preprocesado:
 				os.system("apt-get -y install openjdk-8-jre")
 		else:
 			if(jdk==''):
-				os.system("yum install java-1.8.0-openjdk-devel")
+				os.system("yum -y install java-1.8.0-openjdk-devel")
 			elif(jre==''):
 				os.system("yum -y install java-1.8.0-openjdk")
 		
@@ -195,27 +195,63 @@ class contramedidas:
 
 		def systemK():
 			try:
-				subprocess.call(['apt-get','install','krb5-kdc','krb5-admin-server'])
-				#os.system("apt-get -y install krb5-kdc krb5-admin-server")
+				subprocess.call(['apt-get','-y','install','krb5-kdc','krb5-admin-server'])
 
 			except OSError:
 				try:
 					subprocess.call(['yum','-y','install','krb5-kdc','krb5-admin-server'])
-					#os.system("yum -y install krb5-kdc krb5-admin-server")
+
 				except OSError:
 					print("[Error] Sistema operativo soportado para Debian, derivados y CentOS")
 		systemK()
 
 		#configuración ...
 		
+		def confKC():
+			#/etc/krb5.conf
+			f=open("/etc/krb5.conf")
+			g=open("/etc/krb5.conf.new","w")
+
+			linea=f.readline()
+			work=False
+
+			while(linea!=''):
+				
+				if("[realms]" in linea or "[domain_realm]" in linea):
+					work=True
+
+				if(work):
+					cadena=linea[1:len(linea)]
+					g.write(cadena)
+					linea=f.readline()
+					if("}" in linea):
+						cadena=linea[1:len(linea)]
+						g.write(cadena)
+						work=False
+					elif(linea==''):
+						g.write(cadena)
+						work=False
+				else:
+					g.write(linea)
+					linea=f.readline()
+
+			f.close()
+			g.close()
+
+
 		# ---
 	def Ranger():
 
-		def entornoRangerC():
+		def entornoRangerC():		#BUGS EN MYSQL
 			#ideal tratamiento recogidos en un log ...
 			os.system("yum -y install gcc")
 			
 			#mysql
+			s=subprocess.call(['rpm -qa | grep wget'], shell= True)
+
+			if(s==1):
+				os.system("yum -y install wget")
+
 			os.system("wget https://dev.mysql.com/get/mysql80-community-release-el7-1.noarch.rpm")
 			os.system("yum repolist all | grep mysql")
 			os.system("yum repolist enabled | grep mysql")
@@ -231,7 +267,7 @@ class contramedidas:
 			os.system("mkdir dev")
 			os.system("git clone https://github.com/apache/incubator-ranger.git")
 			os.system("mv incubator-ranger dev")
-			#interesante comprobar mvn antes??
+			#os.system("cd dev/incubator-ranger && mvn clean")
 			os.system("cd dev/incubator-ranger && mvn clean compile package assembly:assembly install")
 
 
