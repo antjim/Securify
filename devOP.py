@@ -35,12 +35,14 @@ class App():
 	def System():
 		
 		try:
-			os.popen('apt-get').read()
+			subprocess.call('apt-get')
+			os.system("clear")
 			return True	#debian y derivados.
 
 		except OSError:
 			try:
-				os.popen('yum').read()	#CentOS y derivados
+				subprocess.call('yum')	#CentOS y derivados
+				os.system("clear")
 				return False
 			except OSError:
 				print("[Error] Sistema operativo soportado para Debian, derivados y CentOS")
