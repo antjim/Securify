@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+#
 #-----------------|
 #autor: Antonio J.|
 #-----------------|
@@ -178,7 +178,7 @@ class contramedidas:
 			print("[OK] Generación de certificados finalizada")
 		
 		if(kerberos == "s" or kerberos==''):
-			print("Instalando Kerberos ")
+			print("Instalando Kerberos ","\n")
 			contramedidas.Kerberos()
 			print("[OK] Instalación del servidor Kerberos finalizada.")
 
@@ -195,27 +195,51 @@ class contramedidas:
 
 		def systemK():
 			try:
+				print("** En caso de aparecer un cuadro para escribir el reino recomendamos usar la tecla 'ESC' para que el sistema se encargue por si mismo. **","\n")
+				input("Pulsa [ENTER] para continuar.")
 				subprocess.call(['apt-get','-y','install','krb5-kdc','krb5-admin-server'])
-
+				os.system("clear")
+				return True
+		
 			except OSError:
 				try:
 					subprocess.call(['yum','-y','install','krb5-kdc','krb5-admin-server'])
+					os.system("clear")
+					return False
 
 				except OSError:
 					print("[Error] Sistema operativo soportado para Debian, derivados y CentOS")
-		systemK()
+		
 
 		#configuración ...
-		
-		def confKC():
+		def trataLinea(linea):
+			res=''
+			for i in range (len(linea)):
+				if(linea[i]=="="):
+					res+=linea[i]
+					break
+				else:
+					res+=linea[i]
+			return res
+
+		def confKC():		#configuración para CentOS | COOKING
 			#/etc/krb5.conf
+		
+			reino=input("Indique nombre del dominio (EXAMPLE.COM): ")
+			#reinoK=input("")
+			#reinoA=input("")
+			url=reino.lower()
+
 			f=open("/etc/krb5.conf")
 			g=open("/etc/krb5.conf.new","w")
+			lineaf=f.readlines()
 
+			f=open("/etc/krb5.conf")
 			linea=f.readline()
+			
 			work=False
 
-			while(linea!=''):
+			while(linea!=lineaf[-1]):
 				
 				if("[realms]" in linea or "[domain_realm]" in linea):
 					work=True
@@ -238,6 +262,102 @@ class contramedidas:
 			f.close()
 			g.close()
 
+
+		def confKD():		#configuración para Debian
+			#/etc/krb5.conf
+
+			reino=input("Indique nombre del dominio (EXAMPLE.COM): ")
+			#reinoK=input("")
+			#reinoA=input("")
+			url=reino.lower()
+
+			g=open("/etc/krb5.conf.new","w")
+			f=open("/etc/krb5.conf","r")
+			lineaf=f.readlines()
+			f.close()
+
+			f=open("/etc/krb5.conf","r")
+			linea=f.readline()
+
+			while(linea!=lineaf[-1]):
+
+				work=False
+
+				if("default_realm" in linea):
+					cadena=trataLinea(linea)
+					g.write(cadena+" "+reino+"\n")	#reino que pone el propio usuario
+					work=True
+
+				if("[realms]" in linea):	#kdc y admin_server = ... pueden ir separados, pero aquí trabajarán en la misma máquina.
+					g.write(linea)
+					
+					g.write("\t"+reino+" = {"+"\n")
+					g.write("\t\t"+"kdc = krb5."+url+"\n")
+					g.write("\t\t"+"admin_server = krb5."+url+"\n")
+					g.write("\t"+"}"+"\n")
+					work=True
+
+				if("[domain_realm]" in linea):
+					g.write(linea)
+					g.write("\n\t"+"."+url+" = "+reino)
+					g.write("\n\t"+url+ " = "+ reino+"\n")
+					work=True
+				
+				if(work==False):	#de esta manera no replicamos las líneas escritas
+					g.write(linea)
+				
+				linea=f.readline()
+
+			g.write(linea)
+			f.close()
+			g.close()
+			#----------
+
+			#/etc/krb5kdc/kdc.conf
+			f=open("/etc/krb5kdc/kdc.conf","r")
+			lineaf=f.readlines()
+			f.close()
+
+			f=open("/etc/krb5kdc/kdc.conf","r")
+			g=open("/etc/krb5kdc/kdc.conf.new","w")
+			linea=f.readline()
+
+
+			while(linea!=lineaf[-1]):
+				work=False
+
+				if("[realms]" in linea):
+					g.write(linea)
+					g.write("    "+reino+" = {"+"\n")
+					linea=f.readline()
+					work=True
+
+				if(work==False):
+					g.write(linea)
+
+				linea=f.readline()
+
+			g.write(linea)
+			f.close()
+			g.close()
+
+			#gestionFinal
+			os.system("rm /etc/krb5.conf")
+			os.system("mv /etc/krb5.conf.new /etc/krb5.conf")
+
+			os.system("rm /etc/krb5kdc/kdc.conf")
+			os.system("mv /etc/krb5kdc/kdc.conf.new /etc/krb5kdc/kdc.conf")
+
+			os.system("krb5_newrealm")
+
+
+		# ----- llamadas -----
+		s=systemK()
+
+		if(s):
+			confKD()
+		else:
+			confKC()
 
 		# ---
 	def Ranger():
