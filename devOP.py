@@ -266,7 +266,9 @@ class contramedidas:
 		def confKD():		#configuración para Debian
 			#/etc/krb5.conf
 
-			reino=input("Indique nombre del dominio (EXAMPLE.COM): ")
+			reino=input("Indique nombre del dominio ([ENTER] para establecer por defecto localhost): ")
+			if(reino==''):
+				reino="localhost"	
 			#reinoK=input("")
 			#reinoA=input("")
 			url=reino.lower()
@@ -348,7 +350,39 @@ class contramedidas:
 			os.system("rm /etc/krb5kdc/kdc.conf")
 			os.system("mv /etc/krb5kdc/kdc.conf.new /etc/krb5kdc/kdc.conf")
 
-			os.system("krb5_newrealm")
+			try:
+				subprocess.call(["krb5_newrealm"],shell=True)
+				os.system("sudo dpkg-reconfigure krb5-kdc")
+
+			except OSError:
+				print("Error instalando krb5_newrealm")
+
+			try:
+				f=open("/etc/krb5kdc/kadm5.acl","r")
+				g=open("/etc/krb5kdc/kadm5.acl.new","w")
+				lineaf=f.readlines()
+
+				c=lineaf[-1]
+				c=c[1:len(c)]
+
+				for i in lineaf:
+					if(i==lineaf[-1]):
+						g.write(c)
+					else:
+						g.write(i)
+
+				f.close()
+				g.close()
+
+				os.system("rm /etc/krb5kdc/kadm5.acl")
+				os.system("mv /etc/krb5kdc/kadm5.acl.new /etc/krb5kdc/kadm5.acl")
+
+			except:
+				print("No existe kadm5.acl")
+				os.system(" '*/admin *' >> /etc/krb5kdc/kadm5.acl")
+
+			os.system("/etc/init.d/krb5-kdc restart")
+			os.system("/etc/init.d/krb5-admin-server restart")
 
 
 		# ----- llamadas -----
