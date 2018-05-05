@@ -225,7 +225,10 @@ class contramedidas:
 		def confKC():		#configuración para CentOS | COOKING
 			#/etc/krb5.conf
 		
-			reino=input("Indique nombre del dominio (EXAMPLE.COM): ")
+			reino=input("Indique nombre del dominio ([ENTER] para establecer por defecto localhost): ")
+			if(reino==''):
+				reino="localhost"	
+
 			#reinoK=input("")
 			#reinoA=input("")
 			url=reino.lower()
@@ -233,34 +236,89 @@ class contramedidas:
 			f=open("/etc/krb5.conf")
 			g=open("/etc/krb5.conf.new","w")
 			lineaf=f.readlines()
+			f.close()
 
 			f=open("/etc/krb5.conf")
 			linea=f.readline()
 			
-			work=False
-
 			while(linea!=lineaf[-1]):
 				
-				if("[realms]" in linea or "[domain_realm]" in linea):
+				work=False
+
+				if("[realms]" in linea):
+					g.write(linea)
+					g.write(" "+reino+" = {"+"\n")
+					g.write(" kdc = "+url+"\n")
+					g.write(" admin_server = "+url+"\n")
 					work=True
 
-				if(work):
-					cadena=linea[1:len(linea)]
-					g.write(cadena)
-					linea=f.readline()
-					if("}" in linea):
-						cadena=linea[1:len(linea)]
-						g.write(cadena)
-						work=False
-					elif(linea==''):
-						g.write(cadena)
-						work=False
-				else:
+				if("[domain_realm]" in linea):
 					g.write(linea)
-					linea=f.readline()
+					g.write("."+url+" = "+reino+"\n")
+					g.write(url+" = "+reino+"\n")
+					work=True
+
+				if("default_realm"):
+					g.write(linea)
+					c=trataLinea(linea)
+					g.write(c+" "+reino)
+					work=True
+
+				if(work==False):
+					g.write(linea)
+
+				linea=f.readline()
 
 			f.close()
 			g.close()
+
+			#/var/kerberos/krb5kdc/kdc.conf
+
+			f=open("/var/kerberos/krb5kdc/kdc.conf")
+			lineaf=f.readlines()
+			f.close()
+
+			f=open("/var/kerberos/krb5kdc/kdc.conf")
+			g=open("/var/kerberos/krb5kdc/kdc.conf.new","w")
+
+			while(linea!=lineaf[-1]):
+				work=False
+
+				if("[realms]" in linea):
+					g.write(linea)
+					g.write("    "+reino+" = {"+"\n")
+					linea=f.readline()
+					work=True
+
+				if(work==False):
+					g.write(linea)
+
+				linea=f.readline()
+
+			g.write(linea)
+			f.close()
+			g.close()
+
+			#/var/kerberos/krb5kdc/kadm5.acl
+			os.system("rm /var/kerberos/krb5kdc/kadm5.acl")
+			f=open("/var/kerberos/krb5kdc/kadm5.acl","w")
+			f.write("*/admin@"+reino+"	*")
+
+			#gestionFinal
+			os.system("rm /etc/krb5.conf")
+			os.system("mv /etc/krb5.conf.new /etc/krb5.conf")
+
+			os.system("rm /var/kerberos/krb5kdc/kdc.conf")
+			os.system("mv /var/kerberos/krb5kdc/kdc.conf.new /var/kerberos/krb5kdc/kdc.conf")
+
+			op="kadmin -q 'addprinc -randkey root/admin@'"+reino
+			os.system(op)
+
+			os.system("systemctl start krb5kdc.service")
+			os.system("systemctl start kadmin.service")
+			os.system("systemctl enable krb5kdc.service")
+			os.system("systemctl enable kadmin.service")
+
 
 
 		def confKD():		#configuración para Debian
