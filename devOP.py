@@ -9,6 +9,7 @@ import os
 import subprocess
 from subprocess import Popen,PIPE,STDOUT
 import errno
+import storm
 
 # -- clases --
 
@@ -143,6 +144,23 @@ class preprocesado:
 		#os.system("cp utilidades/maven.sh /etc/profile.d")
 		#os.system("source /etc/profile.d/maven.sh")
 
+class herramientasBD:
+
+	def Menu():
+		os.system("clear")
+		print(" ")
+		print("===== Herramientas Big Data =====")
+		print("1) Apache Storm")
+		print("===================================")
+		print("2) Volver al menu Contramedidas Generales")
+		print("===================================")
+		qm=input("Seleccionar una de las opciones: ")
+
+		if(qm=="1"):
+			storm.Storm().run()
+
+		else:
+			contramedidas.Menu()
 
 class contramedidas:
 	
@@ -150,12 +168,17 @@ class contramedidas:
 		menu=True
 
 		while(menu):
+			os.system("clear")
+
 			print(" ")
+			print("===== Contramedidas Generales =====")
 			print("1) Mejorar Integridad")
 			print("2) Mejorar Autorización / Autenticación")
 			print("3) Mejorar Anonimidad")
-			print("4) Salir")
-			print(" ")
+			print("===================================")
+			print("4) Mejorar Seguridad de herramientas Big Data")
+			print("5) Salir")
+			print("===================================")
 			qm=input("Seleccionar una de las opciones: ")
 			
 			if(qm=="1"):
@@ -166,6 +189,9 @@ class contramedidas:
 		
 			elif(qm=="3"):
 				contramedidas.gestionAn()
+
+			elif(qm=="4"):
+				herramientasBD.Menu()
 
 			else:
 				menu=False
@@ -178,7 +204,7 @@ class contramedidas:
 			print("[OK] Generación de certificados finalizada")
 		
 		if(kerberos == "s" or kerberos==''):
-			print("Instalando Kerberos ","\n")
+			print("Instalando Kerberos "+"\n")
 			contramedidas.Kerberos()
 			print("[OK] Instalación del servidor Kerberos finalizada.")
 
@@ -328,8 +354,7 @@ class contramedidas:
 			reino=input("Indique nombre del dominio ([ENTER] para establecer por defecto localhost): ")
 			if(reino==''):
 				reino="localhost"	
-			#reinoK=input("")
-			#reinoA=input("")
+
 			url=os.popen("hostname -f").read()
 			url=url[0:len(url)-1]
 
@@ -404,7 +429,6 @@ class contramedidas:
 			g.close()
 
 			#gestionFinal
-			input("PAUSE_______")
 			os.system("rm /etc/krb5.conf")
 			os.system("mv /etc/krb5.conf.new /etc/krb5.conf")
 
@@ -482,7 +506,7 @@ class contramedidas:
 			os.system("mkdir dev")
 			os.system("git clone https://github.com/apache/incubator-ranger.git")
 			os.system("mv incubator-ranger dev")
-			#os.system("cd dev/incubator-ranger && mvn clean")
+			os.system("bash utilidades/maven.sh")
 			os.system("cd dev/incubator-ranger && mvn clean compile package assembly:assembly install")
 
 
