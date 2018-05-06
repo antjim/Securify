@@ -329,7 +329,7 @@ class contramedidas:
 				reino="localhost"	
 			#reinoK=input("")
 			#reinoA=input("")
-			url=os.popen("hostanme -f").read()
+			url=os.popen("hostname -f").read()
 
 			g=open("/etc/krb5.conf.new","w")
 			f=open("/etc/krb5.conf","r")
