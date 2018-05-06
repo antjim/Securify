@@ -191,7 +191,7 @@ class contramedidas:
 	def Certificados():
 		os.system("bash utilidades/cert.sh")
 
-	def Kerberos():	#COOKING
+	def Kerberos():	
 
 		def systemK():
 			try:
@@ -222,7 +222,7 @@ class contramedidas:
 					res+=linea[i]
 			return res
 
-		def confKC():		#configuración para CentOS | COOKING
+		def confKC():		#configuración para CentOS | COOKING - BUGS
 			#/etc/krb5.conf
 		
 			reino=input("Indique nombre del dominio ([ENTER] para establecer por defecto localhost): ")
@@ -231,7 +231,7 @@ class contramedidas:
 
 			#reinoK=input("")
 			#reinoA=input("")
-			url=reino.lower()
+			url=os.popen("hostname -f").read()
 
 			f=open("/etc/krb5.conf")
 			g=open("/etc/krb5.conf.new","w")
@@ -311,8 +311,8 @@ class contramedidas:
 			os.system("rm /var/kerberos/krb5kdc/kdc.conf")
 			os.system("mv /var/kerberos/krb5kdc/kdc.conf.new /var/kerberos/krb5kdc/kdc.conf")
 
-			op="kadmin -q 'addprinc -randkey root/admin@'"+reino
-			os.system(op)
+			#op="kadmin -q 'addprinc -randkey root/admin@'"+reino
+			#os.system(op)
 
 			os.system("systemctl start krb5kdc.service")
 			os.system("systemctl start kadmin.service")
@@ -329,7 +329,7 @@ class contramedidas:
 				reino="localhost"	
 			#reinoK=input("")
 			#reinoA=input("")
-			url=reino.lower()
+			url=os.popen("hostanme -f").read()
 
 			g=open("/etc/krb5.conf.new","w")
 			f=open("/etc/krb5.conf","r")
@@ -437,7 +437,7 @@ class contramedidas:
 
 			except:
 				print("No existe kadm5.acl")
-				os.system(" '*/admin *' >> /etc/krb5kdc/kadm5.acl")
+				os.system(" '*root/admin *' >> /etc/krb5kdc/kadm5.acl")
 
 			os.system("/etc/init.d/krb5-kdc restart")
 			os.system("/etc/init.d/krb5-admin-server restart")
