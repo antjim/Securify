@@ -232,6 +232,7 @@ class contramedidas:
 			#reinoK=input("")
 			#reinoA=input("")
 			url=os.popen("hostname -f").read()
+			url=url[0:len(url)-1]
 
 			f=open("/etc/krb5.conf")
 			g=open("/etc/krb5.conf.new","w")
@@ -330,6 +331,7 @@ class contramedidas:
 			#reinoK=input("")
 			#reinoA=input("")
 			url=os.popen("hostname -f").read()
+			url=url[0:len(url)-1]
 
 			g=open("/etc/krb5.conf.new","w")
 			f=open("/etc/krb5.conf","r")
@@ -352,15 +354,15 @@ class contramedidas:
 					g.write(linea)
 					
 					g.write("\t"+reino+" = {"+"\n")
-					g.write("\t\t"+"kdc = krb5."+url+"\n")
-					g.write("\t\t"+"admin_server = krb5."+url+"\n")
+					g.write("\t\t"+"kdc = "+url+"\n")
+					g.write("\t\t"+"admin_server = "+url+"\n")
 					g.write("\t"+"}"+"\n")
 					work=True
 
 				if("[domain_realm]" in linea):
 					g.write(linea)
-					g.write("\n\t"+"."+url+" = "+reino)
-					g.write("\n\t"+url+ " = "+ reino+"\n")
+					g.write("\t"+"."+url+" = "+reino+"\n")
+					g.write("\t"+url+ " = "+ reino+"\n")
 					work=True
 				
 				if(work==False):	#de esta manera no replicamos las líneas escritas
@@ -402,6 +404,7 @@ class contramedidas:
 			g.close()
 
 			#gestionFinal
+			input("PAUSE_______")
 			os.system("rm /etc/krb5.conf")
 			os.system("mv /etc/krb5.conf.new /etc/krb5.conf")
 
