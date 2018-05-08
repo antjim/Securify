@@ -35,8 +35,9 @@ class Storm():
 			print("2) Mejorar Autorización / Autenticación")
 			print("3) Mejorar Anonimidad")
 			print("===================================")
-			print("4) Volver a contramedidas generales")
-			print("5) Salir")
+			print("4) Iniciar Storm")
+			print("5) Volver a contramedidas generales")
+			print("6) Salir")
 			print("===================================")
 			qm=input("Seleccionar una de las opciones: ")
 
@@ -44,6 +45,9 @@ class Storm():
 				Integridad.cfgSSL(rs)
 
 			elif(qm=="4"):
+				Storm.iniciaStorm(rs,rz)
+
+			elif(qm=="5"):
 				devOP.contramedidas.Menu()
 
 			else:
@@ -75,15 +79,16 @@ class Storm():
 
 	def confStorm(alm,rs):	#lectura del fichero de conf
 		path=rs+"/conf/storm.yaml"
-		
-		f.open(path)
-		g.open(path+".new","w")
-
-		lineaf=f.readlines()
-		f.close()
 
 		for objeto in alm:
-			f.open(path)		
+
+			f=open(path)
+			g=open(path+".new","w")
+
+			lineaf=f.readlines()
+			f.close()
+
+			f=open(path)
 			linea=f.readline()
 
 			while( linea != lineaf[-1] ):
@@ -92,13 +97,15 @@ class Storm():
 
 				if(objeto in linea):
 					g.write(linea)
+					g.write("\n")
 					cadenas=alm[objeto]
 					
 					for cadena in cadenas:
 						if(cadena == cadenas[-1]):
-							g.write(cadena+"\n\n")
+							g.write(" "+cadena+"\n")
+							g.write("\n")
 						else:
-							g.write(cadena+"\n")
+							g.write(" "+cadena+"\n")
 
 					work=False
 
@@ -106,25 +113,37 @@ class Storm():
 					g.write(linea)
 
 				linea=f.readline()
-
-			g.close()
+			
 			f.close()
+			g.close()
 
 			cd="rm "+rs+"/conf/storm.yaml"
 			cd2="mv "+rs+"/conf/storm.yaml.new "+rs+"/conf/storm.yaml"
-			#os.system(cd)
-			#os.system(cd2)
+			os.system(cd)
+			os.system(cd2)
 
 	def compruebaRuta(ruta):
 
 		try:
 			f=open(ruta+"/conf/storm.yaml")
+			f.close()
 			return False
 
 		except:
-			print("No existe el directorio Storm en la ruta: "+ruta)
-			return True
-		
+			try:
+				f=open(ruta+"/bin/zkServer.sh")
+				f.close()
+				return False
+			except:
+				print("No se encuentra la ruta: "+ruta)
+				return True
+
+	def iniciaStorm(rs,rz):
+		cd=rz+"/bin/zkServer.sh start"
+		cd2=rs+"/bin/storm nimbus & "+rs+"/bin/storm supervisor & "+rs+"/bin/storm ui &"
+		os.system(cd)
+		os.system(cd2)
+		input("El sistema puede tardar 1 minuto aproximádamente en estar listo. Pulsa [Enter] para continuar.")
 
 class PreEnt:	#prepararemos directorios o descargaremos storm & zookeeper.
 
@@ -136,8 +155,6 @@ class PreEnt:	#prepararemos directorios o descargaremos storm & zookeeper.
 		obj=[]
 		obj.append(s)
 		obj.append(zk)
-
-		ro=[]
 
 		if(Storm.validaPet(obj)):
 			if(s == 's' or s==''):
@@ -165,7 +182,7 @@ class PreEnt:	#prepararemos directorios o descargaremos storm & zookeeper.
 				os.system("clear")
 				rz=input("Indique ruta dónde se encuentre ZooKeeper: ")
 
-				if(Storm.compruebaRuta(rz) == False):
+				if(Storm.compruebaRuta(rz) ):
 					PreEnt.gestionIn()
 
 			elif(zk=='n'):
@@ -182,6 +199,8 @@ class PreEnt:	#prepararemos directorios o descargaremos storm & zookeeper.
 				cd="mv zookeeper-3.4.10 "+rz
 				os.system(cd)
 
+
+			ro=[]
 			ro.append(rs)
 			ro.append(rz)
 
@@ -199,7 +218,7 @@ class PreEnt:	#prepararemos directorios o descargaremos storm & zookeeper.
 
 		def entStorm(path):
 
-			f=open(path)
+			f=open(path,"r")
 			g=open(path+".new","w")
 
 			lineaf=f.readlines()
@@ -254,10 +273,18 @@ class PreEnt:	#prepararemos directorios o descargaremos storm & zookeeper.
 			f.close()
 			g.close()
 
+			cd="rm "+path
+			cd2="mv "+path+".new"+" "+path
+			os.system(cd)
+			os.system(cd2)
+
+
 		def entZk(path):
+			path2=path+"zoo_sample.cfg"
 			try:
-				f=open(path)
-				cd="mv "+path+"zoo_sample.cfg"+" "+path+"zoo.cfg"
+				f=open(path2,"r")
+				f.close()
+				cd="mv "+path2+" "+path+"zoo.cfg"
 				os.system(cd)
 			except:
 				pass
@@ -270,21 +297,42 @@ class PreEnt:	#prepararemos directorios o descargaremos storm & zookeeper.
 class Integridad:	#opciones de integridad para Storm
 
 	def cfgSSL(rs):
-
-		print("Se crearán unos certificados específicos para Storm.")
+		os.system("clear")
+		print(" ")
+		print("Se crearán unos certificados específicos para Storm."+"\n")
 		input("Pulsa [ENTER] para continuar.")
 		os.system("clear")
-		devOP.contramedidas.Certificados()
+		#devOP.contramedidas.Certificados()
 
-		#input("Creación de certificados finalizado, pulsa [ENTER] para continuar.")
-		claveAlm=input("Introduzca la clave para el almacén de certificados usados: ")
+		os.system(" ========= ")
+		input("Creación de certificados finalizado, pulsa [ENTER] para continuar."+"\n")
+
+		ssP=input("Ruta ssl (por defecto /home/ssl): ")
+		if(ssP == ''):
+			ssP="/home/ssl"
+
+		claveAlm=input("Introduzca la clave usada para el almacén de certificados: ")
 		clavePr=input("Introduzca la clave privada usada en los certificados: ")
+		claveTr=input("Introduzca la clave usada para generar los certificados 'truststore': ")
 
 		alm={}	#La clave privada es la que se solicita en el bash, la otra es del almacén
+		
 		#ui
-		alm["nimbus.seeds: "]=["ui.https.port: 8080","ui.https.keystore.type: 'jks'","ui.https.keystore.path: "+"'"+claveAlm+"'","ui.https.keystore.password: "+"'"+clavePr+"'"]	
+		alm["nimbus.seeds: "]=["ui.https.want.client.auth: true",
+		"ui.https.port: 8080",
+		'ui.https.keystore.type: "jks"',
+		"ui.https.keystore.path: "+'"'+ssP+"/server.keystore.jks"+'"',
+		"ui.https.keystore.password: "+'"'+claveAlm+'"',
+		"ui.https.key.password: "+'"'+clavePr+'"',
+		"ui.https.truststore.path: "+'"'+ssP+"/server.truststore.jks"+'"',
+		"ui.https.truststore.password: "+'"'+claveTr+'"',
+		'ui.https.truststore.type: "jks"']	
+		
 		#drpc
-		alm["ui.https.keystore.password: "]=["drpc.https.port: 3774","drpc.https.keystore.type: 'jks'","drpc.https.keystore.path: "+"'"+claveAlm+"'","drpc.https.keystore.password: "+"'"+clavePr+"'"]		
+		alm[' ui.https.truststore.type: ']=["drpc.https.port: 3774",
+		'drpc.https.keystore.type: "jks"',
+		"drpc.https.keystore.path: "+'"'+claveAlm+'"',
+		"drpc.https.keystore.password: "+'"'+clavePr+'"']		
 
 		Storm.confStorm(alm,rs)
 

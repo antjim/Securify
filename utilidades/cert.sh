@@ -29,7 +29,6 @@ echo " ---------- "
 echo "Duración en días del certificado (intro para establecer por defecto como 365 días): "
 read "DIAS"
 
-echo " ---------- "
 
 if [ "$DIAS" = "" ]; then
 DIAS=365
@@ -43,9 +42,16 @@ keytool -keystore $DIR/server.keystore.jks -alias $ALIAS -validity $DIAS -keyalg
 
 openssl req -new -x509 -keyout $DIR/ca-key -out $DIR/ca-cert -days $DIAS
 
+echo " -------- "
+echo "Recuerde la clave que usará en el truststore."
+echo " -------- "
 keytool -J-Duser.language=en -keystore $DIR/server.truststore.jks -alias CARoot -import -file $DIR/ca-cert
 
 keytool -J-Duser.language=en -keystore $DIR/client.truststore.jks -alias CARoot -import -file $DIR/ca-cert
+
+echo " -------- "
+echo "Recuerde la clave privada"
+echo " -------- "
 
 keytool -keystore $DIR/server.keystore.jks -alias $ALIAS -certreq -file $DIR/cert-file
 
