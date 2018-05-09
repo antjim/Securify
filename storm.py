@@ -44,6 +44,9 @@ class Storm():
 			if(qm=="1"):
 				Integridad.cfgSSL(rs)
 
+			elif(qm=="2"):
+				AtoAte.Menu(rs,rz)
+
 			elif(qm=="4"):
 				Storm.iniciaStorm(rs,rz)
 
@@ -335,6 +338,98 @@ class Integridad:	#opciones de integridad para Storm
 		"drpc.https.keystore.password: "+'"'+clavePr+'"']		
 
 		Storm.confStorm(alm,rs)
+
+class AtoAte:	#opciones para mejorar Autorización y Autenticación
+
+	def Kerberos(rs,rz):	#COOKING
+		
+		devOP.contramedidas.Kerberos()	#realiza la preconfiguración e instalación
+
+		# *** hay que crear usuarios y exportar los keytabs
+
+		#modificación fichero zookeeper zoo.cnf - agregando Kerberos
+
+
+
+		#generación storm_jaas ***
+		cd="touch "+rs+"/conf/storm_jaas.conf"
+		os.system(cd)
+		f=open(rs+"/conf/storm_jaas.conf","w")
+
+		f.write("StormServer {"+"\n")
+		f.write("   com.sun.security.auth.module.Krb5LoginModule required \n")
+		f.write("	useKeyTab=true \n")
+		f.write('	keyTab="/home/tfg/Descargas/zookeeper-3.4.10/conf/keytabs/nimbus.keytab" \n')	#agregar ruta keytab
+		f.write("	storeKey=true \n")
+		f.write("	useTicketCache=false \n")
+		f.write('	principal="storm/nimbus";\n')
+		f.write("}; \n")
+
+		f.write("StormClient { \n")
+		f.write("	com.sun.security.auth.module.Krb5LoginModule required")
+		f.write("	useKeyTab=true")
+		f.write('	keyTab="/home/tfg/Descargas/zookeeper-3.4.10/conf/keytabs/storm.keytab" \n')	#agregar ruta keytab
+		f.write("	storeKey=true \n")
+		f.write("	useTicketCache=false \n")
+		f.write('	serviceName="storm" \n')
+		f.write('	principal="storm"; \n')
+		f.write("}; \n")
+
+		f.write("Client { \n")
+		f.write("	com.sun.security.auth.module.Krb5LoginModule required \n")
+		f.write("	useKeyTab=true \n")
+		f.write('	keyTab="/home/tfg/Descargas/zookeeper-3.4.10/conf/keytabs/storm.keytab" \n')	#agregar ruta keytab
+		f.write("	storeKey=true \n")
+		f.write("	useTicketCache=false \n")
+		f.write('	serviceName="zookeeper" \n')
+		f.write('	principal="storm"; \n')
+		f.write("}; \n")
+
+		f.close()
+
+		#generación zk_jaas	***
+		cd="touch "+rs+"/conf/zk_jaas.conf"
+		os.system(cd)
+		f=open(rs+"/conf/zk_jaas.conf","w")
+
+		f.write("Server { \n")
+		f.write("	com.sun.security.auth.module.Krb5LoginModule required \n")
+		f.write("	useKeyTab=true \n")
+		f.write('	keyTab="/home/tfg/Descargas/zookeeper-3.4.10/conf/keytabs/zookeeper.keytab" \n')
+		f.write("	storeKey=true \n")
+		f.write("	useTicketCache=false \n")
+		f.write('	serviceName="zookeeper" \n')
+		f.write('	principal="zookeeper/localhost"; \n')
+		f.write("}; \n")
+
+		f.close()
+
+
+	def Menu(rs,rz):
+
+		obj=[]
+
+		kerberos=input("¿Instalar y configurar kerberos? s/n: ")
+		ranger=input("¿Compilar e instalar Apache Ranger? s/n: ")
+		
+		obj.append(kerberos)
+		obj.append(ranger)
+
+		os.system("clear")
+		print("Parámetros de configuración seleccionados: Kerberos ["+kerberos+"], Apache Ranger["+ranger+"]")
+		contniuar=input("¿Continuar con configuración seleccionada? s/n: ")
+
+		obj.append(continuar)
+		if(Storm.validaPet(obj)):
+			if(kerberos=='' or kerberos=='s'):
+				Kerberos(rs,rz)	#instala y preconfigura kerberos
+
+			if(ranger=='' or ranger=='s'):
+				devOP.contramedidas.Ranger()	#compila ranger
+		else:
+			print("[ERROR] Por favor use 's'/'INTRO' o 'n' para seleccionar la correspondiente acción")
+			print("Volviendo al menu principal ...")
+			AtoAte.Menu()
 
 if __name__== '__main__':
 	storm=Storm()
