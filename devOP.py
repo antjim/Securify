@@ -48,7 +48,13 @@ class App():
 			except OSError:
 				print("[Error] Sistema operativo soportado para Debian, derivados y CentOS")
 
-
+	def logo():
+		print(" __                      _  __       ")
+		print("/ _\ ___  ___ _   _ _ __(_)/ _|_   _ ")
+		print("\ \ / _ \/ __| | | | '__| | |_| | | |")
+		print("_\ \  __/ (__| |_| | |  | |  _| |_| |")
+		print("\__/\___|\___|\__,_|_|  |_|_|  \__, |")
+		print("			       |___/")
 
 class preprocesado:
 
@@ -148,6 +154,7 @@ class herramientasBD:
 
 	def Menu():
 		os.system("clear")
+		App.logo()
 		print(" ")
 		print("===== Herramientas Big Data =====")
 		print("1) Apache Storm")
@@ -169,7 +176,7 @@ class contramedidas:
 
 		while(menu):
 			os.system("clear")
-
+			App.logo()
 			print(" ")
 			print("===== Contramedidas Generales =====")
 			print("1) Mejorar Integridad")
@@ -211,7 +218,7 @@ class contramedidas:
 		if(ranger == "s" or ranger==''):
 			print("Instalando Apache Ranger ")
 			contramedidas.Ranger()
-			print("[OK] Instalación de Apacha Ranger finalizada")
+			#print("[OK] Instalación de Apacha Ranger finalizada")
 
 
 	def Certificados():
@@ -223,13 +230,30 @@ class contramedidas:
 			try:
 				print("** En caso de aparecer un cuadro para escribir el reino recomendamos usar la tecla 'ESC' para que el sistema se encargue por si mismo. **","\n")
 				input("Pulsa [ENTER] para continuar.")
-				subprocess.call(['apt-get','-y','install','krb5-kdc','krb5-admin-server'])
+
+				subprocess.call(['apt-get'])
+
+				kdc=os.popen("dpkg -l | grep krb5-kdc").read()
+				adser=os.popen("dpkg -l | grep krb5-admin-server").read()
+
+				if(kdc=='' or adser==''):
+
+					subprocess.call(['apt-get','-y','install','krb5-kdc','krb5-admin-server'])
+
 				os.system("clear")
 				return True
 		
 			except OSError:
 				try:
-					subprocess.call(['yum','-y','install','krb5-kdc','krb5-admin-server'])
+					subprocess.call(['yum'])
+
+					kdc=os.popen("rpm -qa | grep krb5-kdc").read()
+					adser=os.popen("rpm -qa | grep krb5-admin-server").read()
+
+					if(kdc=='' or adser==''):
+
+						subprocess.call(['yum','-y','install','krb5-kdc','krb5-admin-server'])
+
 					os.system("clear")
 					return False
 
@@ -340,6 +364,8 @@ class contramedidas:
 
 			#op="kadmin -q 'addprinc -randkey root/admin@'"+reino
 			#os.system(op)
+
+			input("STOP")
 
 			os.system("systemctl start krb5kdc.service")
 			os.system("systemctl start kadmin.service")
@@ -481,7 +507,7 @@ class contramedidas:
 		# ---
 	def Ranger():
 
-		def entornoRangerC():		#BUGS EN MYSQL
+		def entornoRangerC():		
 			#ideal tratamiento recogidos en un log ...
 			os.system("yum -y install gcc")
 			
@@ -491,16 +517,18 @@ class contramedidas:
 			if(s==1):
 				os.system("yum -y install wget")
 
-			os.system("wget https://dev.mysql.com/get/mysql80-community-release-el7-1.noarch.rpm")
-			os.system("yum repolist all | grep mysql")
-			os.system("yum repolist enabled | grep mysql")
-			os.system("sudo yum -y install mysql-community-server")
-			os.system("service mysqld start")
+			os.system("wget http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm")
+			os.system("rpm -ivh mysql-community-release-el7-5.noarch.rpm")
+			os.system("yum update")
+			os.system("yum -y install mysql-server")
+			os.system("systemctl start mysql")
 			#fin mysql ---
 
 		def entornoRangerD():
 			os.system("apt-get -y install gcc")
 			os.system("apt-get -y install mysql-server")
+
+			os.system("clear")
 
 		def compilaRanger():
 			os.system("mkdir dev")
@@ -523,7 +551,7 @@ class contramedidas:
 
 		compilaRanger()
 
-		print("INSTALANDO RANGER")
+		#print("INSTALANDO RANGER")
 
 
 	def gestionIntegridad():

@@ -28,7 +28,7 @@ class Storm():
 
 		while(menu):
 			os.system("clear")
-
+			Storm.logo()
 			print(" ")
 			print("===== Contramedidas Storm =====")
 			print("1) Mejorar Integridad")
@@ -46,6 +46,9 @@ class Storm():
 
 			elif(qm=="2"):
 				AtoAte.Menu(rs,rz)
+
+			elif(qm=="3"):	
+				AtoAte.Kerberos(rs,rz)
 
 			elif(qm=="4"):
 				Storm.iniciaStorm(rs,rz)
@@ -81,7 +84,15 @@ class Storm():
 				print("[Error] Sistema operativo soportado para Debian, derivados y CentOS")
 
 	def confStorm(alm,rs):	#lectura del fichero de conf
-		path=rs+"/conf/storm.yaml"
+
+		if("zookeeper" in rs):
+			path=rs+"/conf/zoo.cfg"
+			cd="rm "+rs+"/conf/zoo.cfg"
+			cd2="mv "+rs+"/conf/zoo.cfg.new "+rs+"/conf/zoo.cfg"
+		else:
+			path=rs+"/conf/storm.yaml"
+			cd="rm "+rs+"/conf/storm.yaml"
+			cd2="mv "+rs+"/conf/storm.yaml.new "+rs+"/conf/storm.yaml"
 
 		for objeto in alm:
 
@@ -99,12 +110,13 @@ class Storm():
 				work=True
 
 				if(objeto in linea):
+					
 					g.write(linea)
 					g.write("\n")
 					cadenas=alm[objeto]
 					
 					for cadena in cadenas:
-						if(cadena == cadenas[-1]):
+						if(cadena in cadenas[-1]):
 							g.write(" "+cadena+"\n")
 							g.write("\n")
 						else:
@@ -120,8 +132,6 @@ class Storm():
 			f.close()
 			g.close()
 
-			cd="rm "+rs+"/conf/storm.yaml"
-			cd2="mv "+rs+"/conf/storm.yaml.new "+rs+"/conf/storm.yaml"
 			os.system(cd)
 			os.system(cd2)
 
@@ -147,6 +157,14 @@ class Storm():
 		os.system(cd)
 		os.system(cd2)
 		input("El sistema puede tardar 1 minuto aproximádamente en estar listo. Pulsa [Enter] para continuar.")
+
+	def logo():
+		print(" __                      _  __       ")
+		print("/ _\ ___  ___ _   _ _ __(_)/ _|_   _ ")
+		print("\ \ / _ \/ __| | | | '__| | |_| | | |")
+		print("_\ \  __/ (__| |_| | |  | |  _| |_| |")
+		print("\__/\___|\___|\__,_|_|  |_|_|  \__, |")
+		print("			       |___/")
 
 class PreEnt:	#prepararemos directorios o descargaremos storm & zookeeper.
 
@@ -332,7 +350,7 @@ class Integridad:	#opciones de integridad para Storm
 		'ui.https.truststore.type: "jks"']	
 		
 		#drpc
-		alm[' ui.https.truststore.type: ']=["drpc.https.port: 3774",
+		alm['ui.https.truststore.type: ']=["drpc.https.port: 3774",
 		'drpc.https.keystore.type: "jks"',
 		"drpc.https.keystore.path: "+'"'+claveAlm+'"',
 		"drpc.https.keystore.password: "+'"'+clavePr+'"']		
@@ -346,9 +364,27 @@ class AtoAte:	#opciones para mejorar Autorización y Autenticación
 		devOP.contramedidas.Kerberos()	#realiza la preconfiguración e instalación
 
 		# *** hay que crear usuarios y exportar los keytabs
+		#print("Por favor ingresa a continuación lo siguiente: addprinc root/admin")
+		#print("Después pulsa la tecla 'q' para salir.")
+		#input("Pulsar [ENTER] para continuar.")
+		#os.system("kadmin.local")
 
-		#modificación fichero zookeeper zoo.cnf - agregando Kerberos
+		os.system("clear")
 
+		print(" ")
+		dr=input("¿Dónde desea guardar los Keytabs necesarios? Indique ruta (Por defecto /pathStorm/conf/.keytabs): ")
+
+		if(dr==''):
+			dr=rs+"/conf/.keytabs"
+			os.system("mkdir "+dr)
+
+		os.system('kadmin.local -q "addprinc -randkey nimbus" ')
+		os.system('kadmin.local -q "addprinc -randkey storm" ')
+		os.system('kadmin.local -q "addprinc -randkey zookeeper" ')
+
+		os.system('kadmin.local -q "ktadd -k '+dr+'/nimbus.keytab storm" ')
+		os.system('kadmin.local -q "ktadd -k '+dr+'/storm.keytab storm" ')
+		os.system('kadmin.local -q "ktadd -k '+dr+'/zookeeper.keytab zookeeper" ')
 
 
 		#generación storm_jaas ***
@@ -359,16 +395,16 @@ class AtoAte:	#opciones para mejorar Autorización y Autenticación
 		f.write("StormServer {"+"\n")
 		f.write("   com.sun.security.auth.module.Krb5LoginModule required \n")
 		f.write("	useKeyTab=true \n")
-		f.write('	keyTab="/home/tfg/Descargas/zookeeper-3.4.10/conf/keytabs/nimbus.keytab" \n')	#agregar ruta keytab
+		f.write('	keyTab="'+dr+'/nimbus.keytab" \n')	
 		f.write("	storeKey=true \n")
 		f.write("	useTicketCache=false \n")
-		f.write('	principal="storm/nimbus";\n')
+		f.write('	principal="nimbus";\n')
 		f.write("}; \n")
 
 		f.write("StormClient { \n")
 		f.write("	com.sun.security.auth.module.Krb5LoginModule required")
 		f.write("	useKeyTab=true")
-		f.write('	keyTab="/home/tfg/Descargas/zookeeper-3.4.10/conf/keytabs/storm.keytab" \n')	#agregar ruta keytab
+		f.write('	keyTab="'+dr+'/storm.keytab" \n')	
 		f.write("	storeKey=true \n")
 		f.write("	useTicketCache=false \n")
 		f.write('	serviceName="storm" \n')
@@ -378,7 +414,7 @@ class AtoAte:	#opciones para mejorar Autorización y Autenticación
 		f.write("Client { \n")
 		f.write("	com.sun.security.auth.module.Krb5LoginModule required \n")
 		f.write("	useKeyTab=true \n")
-		f.write('	keyTab="/home/tfg/Descargas/zookeeper-3.4.10/conf/keytabs/storm.keytab" \n')	#agregar ruta keytab
+		f.write('	keyTab="'+dr+'/storm.keytab" \n')	
 		f.write("	storeKey=true \n")
 		f.write("	useTicketCache=false \n")
 		f.write('	serviceName="zookeeper" \n')
@@ -395,14 +431,33 @@ class AtoAte:	#opciones para mejorar Autorización y Autenticación
 		f.write("Server { \n")
 		f.write("	com.sun.security.auth.module.Krb5LoginModule required \n")
 		f.write("	useKeyTab=true \n")
-		f.write('	keyTab="/home/tfg/Descargas/zookeeper-3.4.10/conf/keytabs/zookeeper.keytab" \n')
+		f.write('	keyTab="'+dr+'/zookeeper.keytab" \n')
 		f.write("	storeKey=true \n")
 		f.write("	useTicketCache=false \n")
 		f.write('	serviceName="zookeeper" \n')
-		f.write('	principal="zookeeper/localhost"; \n')
+		f.write('	principal="zookeeper"; \n')
 		f.write("}; \n")
 
 		f.close()
+
+
+		#modificación fichero zookeeper zoo.cnf - agregando Kerberos
+
+		d={}
+		d['autopurge.purgeInterval=']=["authProvider.1 = org.apache.zookeeper.server.auth.SASLAuthenticationProvider",
+		"-Djava.security.auth.login.config="+rz+"/zk_jaas.conf",
+		"kerberos.removeHostFromPrincipal = true",
+		"kerberos.removeRealmFromPrincipal = true",
+		"jaasLoginRenew=3600000"]
+		
+		Storm.confStorm(d,rz)	#en este caso, el fichero es zoo.cfg
+
+		
+		#modificación fichero storm.yaml
+
+
+
+
 
 
 	def Menu(rs,rz):
@@ -417,12 +472,14 @@ class AtoAte:	#opciones para mejorar Autorización y Autenticación
 
 		os.system("clear")
 		print("Parámetros de configuración seleccionados: Kerberos ["+kerberos+"], Apache Ranger["+ranger+"]")
-		contniuar=input("¿Continuar con configuración seleccionada? s/n: ")
+		continuar=input("¿Continuar con configuración seleccionada? s/n: ")
+
+		os.system("clear")
 
 		obj.append(continuar)
 		if(Storm.validaPet(obj)):
 			if(kerberos=='' or kerberos=='s'):
-				Kerberos(rs,rz)	#instala y preconfigura kerberos
+				AtoAte.Kerberos(rs,rz)	#instala y preconfigura kerberos
 
 			if(ranger=='' or ranger=='s'):
 				devOP.contramedidas.Ranger()	#compila ranger
