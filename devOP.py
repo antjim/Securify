@@ -535,10 +535,32 @@ class contramedidas:
 			os.system("git clone https://github.com/apache/incubator-ranger.git")
 			os.system("mv incubator-ranger dev")
 			os.system("bash utilidades/maven.sh")
-			os.system("cd dev/incubator-ranger && mvn clean compile package assembly:assembly install")
 
 
-		print("PREPARANDO ENTORNO")
+			def comp(debugg):
+
+				if(debugg):
+				
+					err=os.popen("cd dev/incubator-ranger && mvn clean compile package assembly:assembly install -X").read()
+					
+					if(err==''):
+						q=input("Parece que hubo algún tipo de problema, ¿desea volver a ejecutar en modo depuración? s/n: ")
+
+						if(q=='s' or q==''):
+							comp(True)
+				else:
+					err=os.popen("cd dev/incubator-ranger && mvn clean compile package assembly:assembly install").read()
+
+					if(err==''):
+						q=input("Parece que hubo algún tipo de problema, ¿desea volver a ejecutar en modo depuración? s/n: ")
+
+						if(q=='s' or q==''):
+							comp(True)
+
+
+			comp(False)
+
+
 		entorno=App.System()
 
 		if(entorno):
