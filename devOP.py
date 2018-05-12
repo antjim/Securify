@@ -15,14 +15,14 @@ import storm
 
 class App():
 
-	def run(self):
+	def run(self,ro):
 		menu=True
 
 		preprocesado.Menu()
 
 		while(menu):
 			os.system("clear")
-			contramedidas.Menu()
+			contramedidas.Menu(ro)
 			break
 
 	def validaPet(pet):
@@ -152,7 +152,7 @@ class preprocesado:
 
 class herramientasBD:
 
-	def Menu():
+	def Menu(ro):
 		os.system("clear")
 		App.logo()
 		print(" ")
@@ -164,14 +164,14 @@ class herramientasBD:
 		qm=input("Seleccionar una de las opciones: ")
 
 		if(qm=="1"):
-			storm.Storm().run()
+			storm.Storm().run(ro)
 
 		else:
-			contramedidas.Menu()
+			contramedidas.Menu(ro)
 
 class contramedidas:
 	
-	def Menu():
+	def Menu(ro):	#ro es la ruta de storm
 		menu=True
 
 		while(menu):
@@ -198,7 +198,7 @@ class contramedidas:
 				contramedidas.gestionAn()
 
 			elif(qm=="4"):
-				herramientasBD.Menu()
+				herramientasBD.Menu(ro)
 
 			else:
 				menu=False
@@ -227,6 +227,8 @@ class contramedidas:
 	def Kerberos():	
 
 		def systemK():
+			#4 estados - 0: debian y no instalado | 1: debian e instalado | 2: centos y no inst | 3: centos e instalado
+
 			try:
 				print("** En caso de aparecer un cuadro para escribir el reino recomendamos usar la tecla 'ESC' para que el sistema se encargue por si mismo. **","\n")
 				input("Pulsa [ENTER] para continuar.")
@@ -234,14 +236,16 @@ class contramedidas:
 				subprocess.call(['apt-get'])
 
 				kdc=os.popen("dpkg -l | grep krb5-kdc").read()
-				adser=os.popen("dpkg -l | grep krb5-admin-server").read()
+				adser=os.popen("dpkg -l | grep krb5-admin").read()
 
 				if(kdc=='' or adser==''):
 
 					subprocess.call(['apt-get','-y','install','krb5-kdc','krb5-admin-server'])
-
-				os.system("clear")
-				return True
+					os.system("clear")
+					return 0
+				else:
+					os.system("clear")
+					return 1
 		
 			except OSError:
 				try:
@@ -253,9 +257,12 @@ class contramedidas:
 					if(kdc=='' or adser==''):
 
 						subprocess.call(['yum','-y','install','krb5-kdc','krb5-admin-server'])
-
-					os.system("clear")
-					return False
+						os.system("clear")
+						return 2
+					else:
+						alm.append(3)
+						os.system("clear")
+						return 3
 
 				except OSError:
 					print("[Error] Sistema operativo soportado para Debian, derivados y CentOS")
@@ -272,7 +279,7 @@ class contramedidas:
 					res+=linea[i]
 			return res
 
-		def confKC():		#configuración para CentOS | COOKING - BUGS
+		def confKC(nuevo):		#configuración para CentOS | COOKING - BUGS
 			#/etc/krb5.conf
 		
 			reino=input("Indique nombre del dominio ([ENTER] para establecer por defecto localhost): ")
@@ -374,7 +381,7 @@ class contramedidas:
 
 
 
-		def confKD():		#configuración para Debian
+		def confKD(nuevo):		#configuración para Debian
 			#/etc/krb5.conf
 
 			reino=input("Indique nombre del dominio ([ENTER] para establecer por defecto localhost): ")
@@ -462,8 +469,9 @@ class contramedidas:
 			os.system("mv /etc/krb5kdc/kdc.conf.new /etc/krb5kdc/kdc.conf")
 
 			try:
-				subprocess.call(["krb5_newrealm"],shell=True)
-				os.system("sudo dpkg-reconfigure krb5-kdc")
+				if(nuevo):
+					subprocess.call(["krb5_newrealm"],shell=True)
+					os.system("sudo dpkg-reconfigure krb5-kdc")
 
 			except OSError:
 				print("Error instalando krb5_newrealm")
@@ -499,10 +507,16 @@ class contramedidas:
 		# ----- llamadas -----
 		s=systemK()
 
-		if(s):
-			confKD()
+		if(s<2):	#gestión para no volver a escribir krb5_newrealm - sino fallaría
+			if(s==0):
+				confKD(True)
+			else:
+				confKD(False)
 		else:
-			confKC()
+			if(s==2):
+				confKC(True)
+			else:
+				confKC(False)
 
 		# ---
 	def Ranger():
@@ -537,7 +551,8 @@ class contramedidas:
 			os.system("bash utilidades/maven.sh")
 
 
-			def comp(debugg):
+			os.system("cd dev/incubator-ranger && mvn clean compile package assembly:assembly install")
+			def comp(debugg):	#REVISAR
 
 				if(debugg):
 				
@@ -558,7 +573,7 @@ class contramedidas:
 							comp(True)
 
 
-			comp(False)
+			#comp(False)
 
 
 		entorno=App.System()
@@ -651,5 +666,5 @@ class contramedidas:
 
 if __name__== '__main__':
 	app=App()
-	app.run()
+	app.run([])
 

@@ -13,13 +13,15 @@ import devOP
 
 class Storm():
 
-	def run(self):
+	def run(self,ro):
 		menu=True
 		os.system("clear")
 		print(" ")
 		
-		global ro
-		ro=PreEnt.gestionIn()
+		#global ro
+		
+		if(ro==[]):
+			ro=PreEnt.gestionIn()
 
 		rs=ro[0]
 		rz=ro[1]
@@ -54,7 +56,7 @@ class Storm():
 				Storm.iniciaStorm(rs,rz)
 
 			elif(qm=="5"):
-				devOP.contramedidas.Menu()
+				devOP.contramedidas.Menu(ro)
 
 			else:
 				menu=False
@@ -157,6 +159,52 @@ class Storm():
 		os.system(cd)
 		os.system(cd2)
 		input("El sistema puede tardar 1 minuto aproximádamente en estar listo. Pulsa [Enter] para continuar.")
+
+	def generaLineas(alm,rs):
+
+		path=rs+"/conf/storm.yaml"
+		cd="rm "+rs+"/conf/storm.yaml"
+		cd2="mv "+rs+"/conf/storm.yaml.new "+rs+"/conf/storm.yaml"
+
+		f=open(path)
+		lineaf=f.readlines()
+		f.close()
+
+		f=open(path)
+		g=open(rs+"/conf/storm.yaml.new","w")
+		linea=f.readline()
+
+		for objeto in alm:	#solo habrá una iteración - uso de python3 impide coger directamente con keys()
+			cant=len(alm[objeto])
+			work=False
+			cont=False
+
+			while(linea != lineaf[-1]):
+
+				if(objeto in linea):
+					work=True
+
+				if(work):
+					cont==True
+					if((linea=="# \n") or (linea==" \n")):
+						for j in range(cant):
+							g.write("\n")
+
+						linea=f.readline()
+					else:
+						g.write(linea)
+						linea=f.readline()
+				
+				if(cont==False):
+					g.write(linea)
+					linea=f.readline()
+			input("HECHO")
+			f.close()
+			g.close()
+			input("PAUSA")
+			os.system(cd)				
+			os.system(cd2)
+
 
 	def logo():
 		print(" __                      _  __       ")
@@ -323,14 +371,15 @@ class Integridad:	#opciones de integridad para Storm
 		print("Se crearán unos certificados específicos para Storm."+"\n")
 		input("Pulsa [ENTER] para continuar.")
 		os.system("clear")
-		#devOP.contramedidas.Certificados()
-
-		os.system(" ========= ")
-		input("Creación de certificados finalizado, pulsa [ENTER] para continuar."+"\n")
 
 		ssP=input("Ruta ssl (por defecto /home/ssl): ")
 		if(ssP == ''):
 			ssP="/home/ssl"
+
+		#devOP.contramedidas.Certificados()
+
+		os.system(" ========= ")
+		input("Creación de certificados finalizado, pulsa [ENTER] para continuar."+"\n")
 
 		claveAlm=input("Introduzca la clave usada para el almacén de certificados: ")
 		clavePr=input("Introduzca la clave privada usada en los certificados: ")
@@ -455,8 +504,36 @@ class AtoAte:	#opciones para mejorar Autorización y Autenticación
 		
 		#modificación fichero storm.yaml
 
+		d2={}
+		d3={}
+		d4={}
+		d5={}
 
+		#storm-java
+		d2["storm.zookeeper.servers:"]=['java.security.auth.login.config: "'+rs+'/conf/storm_jaas.conf"',
+		'storm.thrift.transport: "org.apache.storm.security.auth.kerberos.KerberosSaslTransportPlugin"',
+		'storm.principal.tolocal: "org.apache.storm.security.auth.KerberosPrincipalToLocal"',
+		'storm.zookeeper.superACL: "sasl:storm"']
 
+		#nimbus
+		d3["nimbus.seeds:"]=['nimbus.childopts: "-Xmx1024m -Djava.security.auth.login.config='+rs+'/conf/storm_jaas.conf"',
+		'nimbus.authorizer: "org.apache.storm.security.auth.authorizer.SimpleACLAuthorizer"']
+
+		#supervisor
+		d4["nimbus.authorizer:"]=['supervisor.childopts: "-Xmx256m -Djava.security.auth.login.config='+rs+'/conf/storm_jaas.conf"']
+
+		#ui
+		d5["supervisor.childopts:"]=['ui.childopts: "-Xmx768m -Djava.security.auth.login.config='+rz+'/conf/storm_jaas.conf"']
+
+		Storm.generaLineas(d2,rs)
+		Storm.generaLineas(d3,rs)
+		Storm.generaLineas(d4,rs)
+		Storm.generaLineas(d5,rs)
+
+		Storm.confStorm(d2,rs)
+		Storm.confStorm(d3,rs)
+		Storm.confStorm(d4,rs)
+		Storm.confStorm(d5,rs)
 
 
 
