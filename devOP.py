@@ -131,11 +131,6 @@ class preprocesado:
 				os.system("yum -y install java-1.8.0-openjdk-devel")
 			elif(jre==''):
 				os.system("yum -y install java-1.8.0-openjdk")
-		
-		#os.system("mkdir /usr/java")
-		#os.system("cp -r utilidades/jdk1.8.0_171 /usr/java")
-		#os.system("cp utilidades/java.sh /etc/profile.d")
-		#os.system("source /etc/profile.d/java.sh")
 
 	def mavenInstall():
 		s=App.System()
@@ -144,11 +139,6 @@ class preprocesado:
 			os.system("apt-get -y install maven")
 		else:
 			os.system("yum -y install maven")
-
-		#os.system("tar -zxvf utilidades/apache-maven-3.5.3-bin.tar.gz")
-		#os.system("mv apache-maven-3.5.3 /opt/apache-maven-3.5.3")
-		#os.system("cp utilidades/maven.sh /etc/profile.d")
-		#os.system("source /etc/profile.d/maven.sh")
 
 class herramientasBD:
 
@@ -169,12 +159,108 @@ class herramientasBD:
 		else:
 			contramedidas.Menu(ro)
 
+
+class ayuda:
+
+	def Menu(ro):
+		while(True):
+			os.system("clear")
+			App.logo()
+			print(" ")
+			print("===================== Menú de Ayuda =====================")
+			print("1) Sobre la Integridad")
+			print("2) Sobre la Autorización / Autenticación")
+			print("3) Sobre la Anonimidad")
+			print("4) Sobre la fortificación de las herramientas Big Data")
+			print("5) Inicio de una herramienta")
+			print("=========================================================")
+			print("6) Volver a Contramedidas generales")
+			print("=========================================================")
+			qm=input("Seleccionar una de las opciones: ")		
+			
+			if(qm=="1"):
+				ayuda.Integridad()
+
+			elif(qm=="2"):
+				ayuda.AutoAuten()
+
+			elif(qm=="3"):
+				ayuda.Anonimidad()
+
+			elif(qm=="4"):
+				ayuda.BigData()
+
+			elif(qm=="5"):
+				ayuda.Inicio()
+
+			else:
+				contramedidas.Menu(ro)
+
+
+	def Integridad():
+		os.system("clear")
+		print(" ")
+		cadena="En esta sección podrás hacer uso de distintas herramientas que te permitirán mejorar"
+		s=" la integridad tanto de manera general como focalizada a alguna de las herramientas."
+		s1=" Con ello se mejorará la veracidad de la información con la que se trabaja."
+		s2=" Dicha sección contará con una configuración de certificados SSL que aseguren lo anteriormente mencionado.\n\n"
+		s3=" Para usarse únicamente es necesario usar en el menú de contramedidas generales o el menú"
+		s4=" de herramientas Big Data la tecla '1'. A continuación sólo tendremos que usar las claves"
+		cadena+=s+s1+s2+s3+s4+" que creamos oportunas, así como dónde querámos guardar dichos certificados."
+		print(format(cadena))
+		print(" ")
+		input("Pulsa [ENTER] para continuar")
+
+	def AutoAuten():
+		os.system("clear")
+		print(" ")
+		c="En esta sección se mejorará dos aspectos: la Autorización y la Autenticación. Para ello "
+		c=c+"se podrá hacer uso de dos herramientas a elegir tanto en medidas generales como en el apartado"
+		c=c+"de herramietnas Big Data, estas son kerberos y Apache Ranger.\n\n"
+		c=c+"Si se pretende instalar/configurar Kerberos, desde la sección general, se realizará un preconfigurado "
+		c=c+"que permite el uso de Kerberos para más tarde hacerse uso. En caso de hacerse desde la sección de"
+		c=c+" las herramientas, se configurará de manera más especifica para la configuración de dicha herramienta. \n\n"
+		c=c+"Si hablamos de Ranger, únicamente se realizará una descarga de la última versión y compilación, la "
+		c=c+"integración de la herramienta se debe hacer aparte."
+		print(format(c))
+		print(" ")
+		input("Pulsa [ENTER] para continuar")
+
+	def Anonimidad():
+		os.system("clear")
+		print(" ")
+		c="En esta sección se hará uso de la herramientas Kerberos para establecer el anonimato en "
+		c=c+"la herramienta Big Data deseada o de manera general, mediante un preconfigurado. "
+		print(format(c))
+		print(" ")
+		input("Pulsa [ENTER] para continuar")
+
+	def BigData():
+		os.system("clear")
+		print(" ")
+		c="En esta sección se podrán elegir una de las herramientas de las que aparecen en "
+		c=c+"el menú de herramientas de Big Data. Una vez se seleccione se podrán elegir 3 "
+		c=c+"principales funciones que mejorarán la seguridad de dicha herramienta: Integridad"
+		c=c+", Autorización / Autenticación y por último el Anonimato."
+		print(format(c))
+		print(" ")
+		input("Pulsa [ENTER] para continuar")
+
+	def Inicio():
+		os.system("clear")
+		print(" ")
+		c="Esta sección se encuentra exclusivamente en el apartado de cada herramienta con "
+		c=c+"ello se pretende iniciar la herramienta para ofrecer una mera comodidad y no "
+		c=c+"tener que recurrir a terminales extras para arrancarlas."
+		print(format(c))
+		print(" ")
+		input("Pulsa [ENTER] para continuar")
+
 class contramedidas:
 	
 	def Menu(ro):	#ro es la ruta de storm
-		menu=True
 
-		while(menu):
+		while(True):
 			os.system("clear")
 			App.logo()
 			print(" ")
@@ -184,7 +270,8 @@ class contramedidas:
 			print("3) Mejorar Anonimidad")
 			print("===================================")
 			print("4) Mejorar Seguridad de herramientas Big Data")
-			print("5) Salir")
+			print("5) Ayuda")
+			print("6) Salir")
 			print("===================================")
 			qm=input("Seleccionar una de las opciones: ")
 			
@@ -200,8 +287,11 @@ class contramedidas:
 			elif(qm=="4"):
 				herramientasBD.Menu(ro)
 
+			elif(qm=="5"):
+				ayuda.Menu(ro)
+
 			else:
-				menu=False
+				break
 
 
 	def gestionaContramedidas(cert,kerberos,ranger):
@@ -251,12 +341,12 @@ class contramedidas:
 				try:
 					subprocess.call(['yum'])
 
-					kdc=os.popen("rpm -qa | grep krb5-kdc").read()
-					adser=os.popen("rpm -qa | grep krb5-admin-server").read()
+					works=os.popen("rpm -qa | grep krb5-workstation").read()
+					adser=os.popen("rpm -qa | grep krb5-server").read()
 
-					if(kdc=='' or adser==''):
+					if(works=='' or adser==''):
 
-						subprocess.call(['yum','-y','install','krb5-kdc','krb5-admin-server'])
+						subprocess.call(["yum -y install krb5-server krb5-workstation pam_krb5"],shell=True)
 						os.system("clear")
 						return 2
 					else:
@@ -286,8 +376,6 @@ class contramedidas:
 			if(reino==''):
 				reino="localhost"	
 
-			#reinoK=input("")
-			#reinoA=input("")
 			url=os.popen("hostname -f").read()
 			url=url[0:len(url)-1]
 
@@ -327,6 +415,7 @@ class contramedidas:
 
 				linea=f.readline()
 
+			g.write(linea)
 			f.close()
 			g.close()
 
@@ -337,6 +426,7 @@ class contramedidas:
 			f.close()
 
 			f=open("/var/kerberos/krb5kdc/kdc.conf")
+			linea=f.readline()
 			g=open("/var/kerberos/krb5kdc/kdc.conf.new","w")
 
 			while(linea!=lineaf[-1]):

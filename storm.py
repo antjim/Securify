@@ -14,7 +14,6 @@ import devOP
 class Storm():
 
 	def run(self,ro):
-		menu=True
 		os.system("clear")
 		print(" ")
 		
@@ -28,19 +27,20 @@ class Storm():
 
 		PreEnt.preparaEnt(rs,rz)
 
-		while(menu):
+		while(True):
 			os.system("clear")
 			Storm.logo()
 			print(" ")
-			print("===== Contramedidas Storm =====")
+			print("========== Contramedidas Storm ==========")
 			print("1) Mejorar Integridad")
 			print("2) Mejorar Autorización / Autenticación")
 			print("3) Mejorar Anonimidad")
-			print("===================================")
+			print("=========================================")
 			print("4) Iniciar Storm")
-			print("5) Volver a contramedidas generales")
-			print("6) Salir")
-			print("===================================")
+			print("5) Ayuda")
+			print("6) Volver a contramedidas generales")
+			print("7) Salir")
+			print("=========================================")
 			qm=input("Seleccionar una de las opciones: ")
 
 			if(qm=="1"):
@@ -55,11 +55,14 @@ class Storm():
 			elif(qm=="4"):
 				Storm.iniciaStorm(rs,rz)
 
-			elif(qm=="5"):
+			elif(qm=="6"):
 				devOP.contramedidas.Menu(ro)
 
+			elif(qm=="5"):
+				devOP.ayuda.Menu(ro)
+
 			else:
-				menu=False
+				break
 
 
 	def validaPet(pet):
@@ -135,7 +138,7 @@ class Storm():
 
 			f.close()
 			g.close()
-			
+
 			os.system(cd)
 			os.system(cd2)
 
