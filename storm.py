@@ -103,7 +103,6 @@ class Storm():
 
 			lineaf=f.readlines()
 			f.close()
-
 			f=open(path)
 			linea=f.readline()
 
@@ -113,8 +112,6 @@ class Storm():
 
 				if(objeto in linea):
 					
-					g.write(linea)
-					g.write("\n")
 					cadenas=alm[objeto]
 					
 					for cadena in cadenas:
@@ -124,16 +121,21 @@ class Storm():
 						else:
 							g.write(" "+cadena+"\n")
 
+					g.write(linea)
+					g.write("\n")
+
 					work=False
 
 				elif(work):
 					g.write(linea)
 
 				linea=f.readline()
-			
+			print(linea)
+			g.write(linea)
+
 			f.close()
 			g.close()
-
+			
 			os.system(cd)
 			os.system(cd2)
 
@@ -183,21 +185,27 @@ class Storm():
 
 				if(objeto in linea):
 					work=True
+					input(linea)
 
 				if(work):
 					cont==True
 					if((linea=="# \n") or (linea==" \n")):
 						for j in range(cant):
 							g.write("\n")
-
 						linea=f.readline()
 					else:
+						input(linea)
+						input(lineaf[-1])
 						g.write(linea)
 						linea=f.readline()
 				
 				if(cont==False):
 					g.write(linea)
+					input(linea)
 					linea=f.readline()
+
+			g.write(linea)
+
 			input("HECHO")
 			f.close()
 			g.close()
@@ -287,6 +295,9 @@ class PreEnt:	#prepararemos directorios o descargaremos storm & zookeeper.
 
 		def entStorm(path):
 
+			cd="rm "+path
+			cd2="mv "+path+".new"+" "+path
+
 			f=open(path,"r")
 			g=open(path+".new","w")
 
@@ -339,11 +350,10 @@ class PreEnt:	#prepararemos directorios o descargaremos storm & zookeeper.
 					g.write(linea)
 					linea=f.readline()
 
+			g.write(linea)
 			f.close()
 			g.close()
 
-			cd="rm "+path
-			cd2="mv "+path+".new"+" "+path
 			os.system(cd)
 			os.system(cd2)
 
@@ -506,8 +516,6 @@ class AtoAte:	#opciones para mejorar Autorización y Autenticación
 
 		d2={}
 		d3={}
-		d4={}
-		d5={}
 
 		#storm-java
 		d2["storm.zookeeper.servers:"]=['java.security.auth.login.config: "'+rs+'/conf/storm_jaas.conf"',
@@ -515,26 +523,17 @@ class AtoAte:	#opciones para mejorar Autorización y Autenticación
 		'storm.principal.tolocal: "org.apache.storm.security.auth.KerberosPrincipalToLocal"',
 		'storm.zookeeper.superACL: "sasl:storm"']
 
-		#nimbus
+		#nimbus - supervisor - ui
 		d3["nimbus.seeds:"]=['nimbus.childopts: "-Xmx1024m -Djava.security.auth.login.config='+rs+'/conf/storm_jaas.conf"',
-		'nimbus.authorizer: "org.apache.storm.security.auth.authorizer.SimpleACLAuthorizer"']
+		'nimbus.authorizer: "org.apache.storm.security.auth.authorizer.SimpleACLAuthorizer"',
+		'supervisor.childopts: "-Xmx256m -Djava.security.auth.login.config='+rs+'/conf/storm_jaas.conf"',
+		'ui.childopts: "-Xmx768m -Djava.security.auth.login.config='+rz+'/conf/storm_jaas.conf"']
 
-		#supervisor
-		d4["nimbus.authorizer:"]=['supervisor.childopts: "-Xmx256m -Djava.security.auth.login.config='+rs+'/conf/storm_jaas.conf"']
-
-		#ui
-		d5["supervisor.childopts:"]=['ui.childopts: "-Xmx768m -Djava.security.auth.login.config='+rz+'/conf/storm_jaas.conf"']
-
-		Storm.generaLineas(d2,rs)
-		Storm.generaLineas(d3,rs)
-		Storm.generaLineas(d4,rs)
-		Storm.generaLineas(d5,rs)
-
+		#Storm.generaLineas(d2,rs)
 		Storm.confStorm(d2,rs)
-		Storm.confStorm(d3,rs)
-		Storm.confStorm(d4,rs)
-		Storm.confStorm(d5,rs)
 
+		#Storm.generaLineas(d3,rs)
+		Storm.confStorm(d3,rs)
 
 
 	def Menu(rs,rz):
@@ -563,7 +562,7 @@ class AtoAte:	#opciones para mejorar Autorización y Autenticación
 		else:
 			print("[ERROR] Por favor use 's'/'INTRO' o 'n' para seleccionar la correspondiente acción")
 			print("Volviendo al menu principal ...")
-			AtoAte.Menu()
+			AtoAte.Menu(rs,rz)
 
 if __name__== '__main__':
 	storm=Storm()
