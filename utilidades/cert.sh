@@ -1,11 +1,11 @@
 #!/bin/bash
 # -*- ENCODING: UTF-8 -*-
 
-echo "Ruta por defecto /home/ssl, pulsar intro para confirmar o agrega una nueva ruta dónde guardar los certificados: "
+echo "Ruta por defecto /home/.ssl, pulsar intro para confirmar o agrega una nueva ruta dónde guardar los certificados: "
 read "DIR"
 if [ "$DIR" = "" ]; then
-DIR=/home/ssl
-mkdir /home/ssl
+DIR=/home/.ssl
+mkdir /home/.ssl
 fi
 
 echo " ---------- "

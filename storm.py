@@ -385,11 +385,13 @@ class Integridad:	#opciones de integridad para Storm
 		input("Pulsa [ENTER] para continuar.")
 		os.system("clear")
 
-		ssP=input("Ruta ssl (por defecto /home/ssl): ")
+		ssP=input("Ruta ssl (por defecto /home/.ssl): ")
 		if(ssP == ''):
-			ssP="/home/ssl"
+			ssP="/home/.ssl"
 
-		#devOP.contramedidas.Certificados()
+		existe=os.popen("ls "+ssP).read()
+		if(existe==''):
+			devOP.contramedidas.Certificados()
 
 		os.system(" ========= ")
 		input("Creación de certificados finalizado, pulsa [ENTER] para continuar."+"\n")
