@@ -371,7 +371,7 @@ class contramedidas:
 						res+=linea[i]
 			return res
 
-		def confKC(nuevo):		#configuración para CentOS | COOKING - BUGS
+		def confKC(nuevo):		#configuración para CentOS | servicios fallan, pero funciona sistema
 			#/etc/krb5.conf
 		
 			reino=input("Indique nombre del dominio ([ENTER] para establecer por defecto localhost): ")
@@ -389,7 +389,7 @@ class contramedidas:
 			f=open("/etc/krb5.conf")
 			linea=f.readline()
 
-			input("ANTES DE PROCESAR")
+			#input("ANTES DE PROCESAR")
 			
 			while(linea!=lineaf[-1]):
 				
@@ -653,7 +653,7 @@ class contramedidas:
 			os.system("cd dev/incubator-ranger && mvn clean compile package assembly:assembly install")
 			print(" ")
 			input(" Pulse [ENTER] para continuar.")
-			
+
 			def comp(debugg):	#REVISAR
 
 				if(debugg):
