@@ -346,7 +346,7 @@ class contramedidas:
 
 					if(works=='' or adser==''):
 
-						subprocess.call(["yum -y install krb5-server krb5-workstation pam_krb5"],shell=True)
+						subprocess.call(["yum -y install krb5-server krb5-workstation pam_krb5 krb5-libs"],shell=True)
 						os.system("clear")
 						return 2
 					else:
@@ -386,6 +386,8 @@ class contramedidas:
 
 			f=open("/etc/krb5.conf")
 			linea=f.readline()
+
+			input("ANTES DE PROCESAR")
 			
 			while(linea!=lineaf[-1]):
 				
@@ -451,6 +453,7 @@ class contramedidas:
 			os.system("rm /var/kerberos/krb5kdc/kadm5.acl")
 			f=open("/var/kerberos/krb5kdc/kadm5.acl","w")
 			f.write("*/admin@"+reino+"	*")
+			f.close()
 
 			#gestionFinal
 			os.system("rm /etc/krb5.conf")
@@ -462,11 +465,11 @@ class contramedidas:
 			#op="kadmin -q 'addprinc -randkey root/admin@'"+reino
 			#os.system(op)
 
-			input("STOP")
+			#input("STOP")
 
-			os.system("systemctl start krb5kdc.service")
+			os.system("systemctl start krb5kdc kadmin")
 			os.system("systemctl start kadmin.service")
-			os.system("systemctl enable krb5kdc.service")
+			os.system("systemctl enable krb5kdc kadmin")
 			os.system("systemctl enable kadmin.service")
 
 
