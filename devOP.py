@@ -350,7 +350,6 @@ class contramedidas:
 						os.system("clear")
 						return 2
 					else:
-						alm.append(3)
 						os.system("clear")
 						return 3
 
@@ -362,11 +361,14 @@ class contramedidas:
 		def trataLinea(linea):
 			res=''
 			for i in range (len(linea)):
-				if(linea[i]=="="):
-					res+=linea[i]
-					break
-				else:
-					res+=linea[i]
+
+				if(linea[i]!="#"):
+
+					if(linea[i]=="="):
+						res+=linea[i]
+						break
+					else:
+						res+=linea[i]
 			return res
 
 		def confKC(nuevo):		#configuración para CentOS | COOKING - BUGS
@@ -398,18 +400,18 @@ class contramedidas:
 					g.write(" "+reino+" = {"+"\n")
 					g.write(" kdc = "+url+"\n")
 					g.write(" admin_server = "+url+"\n")
+					g.write(" }\n")
 					work=True
 
 				if("[domain_realm]" in linea):
 					g.write(linea)
-					g.write("."+url+" = "+reino+"\n")
-					g.write(url+" = "+reino+"\n")
+					g.write(" ."+url+" = "+reino+"\n")
+					g.write(" "+url+" = "+reino+"\n")
 					work=True
 
-				if("default_realm"):
-					g.write(linea)
+				if("default_realm" in linea):
 					c=trataLinea(linea)
-					g.write(c+" "+reino)
+					g.write(c+" "+reino+"\n")
 					work=True
 
 				if(work==False):
@@ -449,10 +451,14 @@ class contramedidas:
 			f.close()
 			g.close()
 
+			#creación bd
+			if(nuevo):
+				os.system("create -r -s "+reino)
+
 			#/var/kerberos/krb5kdc/kadm5.acl
 			os.system("rm /var/kerberos/krb5kdc/kadm5.acl")
 			f=open("/var/kerberos/krb5kdc/kadm5.acl","w")
-			f.write("*/admin@"+reino+"	*")
+			f.write("* /admin@"+reino+"	*")
 			f.close()
 
 			#gestionFinal
@@ -626,7 +632,7 @@ class contramedidas:
 
 			os.system("wget http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm")
 			os.system("rpm -ivh mysql-community-release-el7-5.noarch.rpm")
-			os.system("yum update")
+			os.system("yum -y update")
 			os.system("yum -y install mysql-server")
 			os.system("systemctl start mysql")
 			#fin mysql ---
@@ -645,6 +651,9 @@ class contramedidas:
 
 
 			os.system("cd dev/incubator-ranger && mvn clean compile package assembly:assembly install")
+			print(" ")
+			input(" Pulse [ENTER] para continuar.")
+			
 			def comp(debugg):	#REVISAR
 
 				if(debugg):
@@ -664,7 +673,6 @@ class contramedidas:
 
 						if(q=='s' or q==''):
 							comp(True)
-
 
 			#comp(False)
 
