@@ -1,6 +1,6 @@
 # Securify
 
-Este programa recogerá una automatización para una configuración manual o preparada para reforzar la seguridad de una serie de herramientas para Big Data.
+Securify es un DevOP que trata que posee una automatización para la mejora de seguridad de herramientas usadas en Big Data. En este caso, sólo existe un caso específico, pero la idea es seguir creciendo para agilizar a cualquier personal de las TI.
 
 ## Requisitos
 
@@ -13,3 +13,13 @@ EL script se encargará de detectar necesidades básicas para poder trabajar cor
 ## Uso
 
 Para hacer uso del script, simplemente será necesario ejecutar el siguiente comando desde consola con permisos de superusuario: `root$ python3 devOP.py`
+
+En caso de que se use CentOS o algún tipo de sistema derivado, se puede usar un pequeño script que se encuentra en la carpeta de ***utilidades*** . Para usarse simplemente escribimos en una terminal con permisos de superusuario lo siguiente: `root$ bash python3.sh` . Una vez finalizado podemos comprobar que tenemos ***python3.6*** escribiendo `$ python3.6 -V` .
+
+## Aspectos a tener en cuenta
+
+Si se marca la opción de instalar Apache Ranger es posible que por un lado pueda quedarse la descarga pillada (en este caso simplemente tener paciencia) o llegue a fallar en alguno de los puntos, es algo relativo a la configuración, por ello no facilitamos la posibilidad de automatizar dicho proceso, puesto que en cada ejecución y en cada máquina, actua de una manera distinta, exceptuando errores claros. Esto ocurre tanto de manera general como en una herramienta concreta. 
+
+Por tanto en caso de fallo volver a ejecutar en modo depuración desde el directorio ***dev/incubator-ranger*** , mediante el comando `root$ mvn clean compile package assembly:assembly install -X` . Para mayor información: 
+
+https://cwiki.apache.org/confluence/display/RANGER/Apache+Ranger+0.5.0+Installation#ApacheRanger0.5.0Installation-InstallationInstructions
