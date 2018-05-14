@@ -48,6 +48,18 @@ class App():
 			except OSError:
 				print("[Error] Sistema operativo soportado para Debian, derivados y CentOS")
 
+	def checkRoot(self):
+		os.system("touch /root/test")
+		try:
+			f=open("/root/test")
+			f.close()
+			os.system("rm -f /root/test")
+			return True
+		except:
+			print("Se necesitan permisos de superusuario para funcionar.")
+			return False
+
+
 	def logo():
 		print(" __                      _  __       ")
 		print("/ _\ ___  ___ _   _ _ __(_)/ _|_   _ ")
@@ -767,5 +779,6 @@ class contramedidas:
 
 if __name__== '__main__':
 	app=App()
-	app.run([])
+	if(app.checkRoot()):
+		app.run([])
 

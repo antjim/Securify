@@ -188,7 +188,6 @@ class Storm():
 
 				if(objeto in linea):
 					work=True
-					input(linea)
 
 				if(work):
 					cont==True
@@ -197,22 +196,19 @@ class Storm():
 							g.write("\n")
 						linea=f.readline()
 					else:
-						input(linea)
-						input(lineaf[-1])
 						g.write(linea)
 						linea=f.readline()
 				
 				if(cont==False):
 					g.write(linea)
-					input(linea)
 					linea=f.readline()
 
 			g.write(linea)
 
-			input("HECHO")
+			#input("HECHO")
 			f.close()
 			g.close()
-			input("PAUSA")
+			#input("PAUSA")
 			os.system(cd)				
 			os.system(cd2)
 
@@ -570,5 +566,8 @@ class AtoAte:	#opciones para mejorar Autorización y Autenticación
 			AtoAte.Menu(rs,rz)
 
 if __name__== '__main__':
-	storm=Storm()
-	storm.run() 
+	try:
+		storm=Storm()
+		storm.run() 
+	except:
+		print("Por favor, inicie el programa desde `root$ python3 devOP.py`")
