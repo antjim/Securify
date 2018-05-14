@@ -56,6 +56,7 @@ class App():
 			os.system("rm -f /root/test")
 			return True
 		except:
+			os.system("clear")
 			print("Se necesitan permisos de superusuario para funcionar.")
 			return False
 
