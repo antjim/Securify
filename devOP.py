@@ -17,15 +17,9 @@ class App():
 
 	def run(self,ro):
 
-		res=preprocesado.Menu()
-
-		os.system("clear")
-		
-		if(res==False):
+		if(preprocesado.Menu()==False):
+			os.system("clear")
 			contramedidas.Menu(ro)
-		
-		else:
-
 
 	def validaPet(pet):
 		res=True
@@ -91,7 +85,7 @@ class preprocesado:
 		obj["Java - JDK"]= qjk==''
 		obj["Java - JRE"]= qje==''
 		obj["Apache Maven"]= qm==''	#False -> el paquete existe / True -> el paquete no está instalado
-		
+	
 		if(True in obj.values()):
 			l=[]
 			cont=1
@@ -121,7 +115,8 @@ class preprocesado:
 					return False
 				else:
 					print("Procesado inicial cancelado.\n")
-					print("No se puede continuar sin los paquetes "+l)
+					print("No se puede continuar sin los paquetes.\n")
+					input("Presiona [ENTER] para continuar.")
 					return True
 
 			else:
