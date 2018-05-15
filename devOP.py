@@ -16,14 +16,16 @@ import storm
 class App():
 
 	def run(self,ro):
-		menu=True
 
-		preprocesado.Menu()
+		res=preprocesado.Menu()
 
-		while(menu):
-			os.system("clear")
+		os.system("clear")
+		
+		if(res==False):
 			contramedidas.Menu(ro)
-			break
+		
+		else:
+
 
 	def validaPet(pet):
 		res=True
@@ -72,63 +74,63 @@ class App():
 class preprocesado:
 
 	def Menu():
-		menu=True
+	
+		s=App.System()
+
+		if(s):
+			qjk=os.popen("dpkg -l | grep openjdk-8-jdk").read()
+			qje=os.popen("dpkg -l | grep openjdk-8-jre").read()
+			qm=os.popen("dpkg -l | grep maven").read()
+
+		else:
+			qjk=os.popen("rpm -qa | grep java-1.8.0-openjdk").read()
+			qje=os.popen("rpm -qa | grep  java-1.8.0-openjdk").read()
+			qm=os.popen("rpm -qa | grep maven").read()
+
+		obj={}
+		obj["Java - JDK"]= qjk==''
+		obj["Java - JRE"]= qje==''
+		obj["Apache Maven"]= qm==''	#False -> el paquete existe / True -> el paquete no está instalado
 		
-		while(menu):
-			s=App.System()
+		if(True in obj.values()):
+			l=[]
+			cont=1
+			for i in obj:
+				if(obj[i]):
+					l.append(i)
+					cont+=1
 
-			if(s):
-				qjk=os.popen("dpkg -l | grep openjdk-8-jdk").read()
-				qje=os.popen("dpkg -l | grep openjdk-8-jre").read()
-				qm=os.popen("dpkg -l | grep maven").read()
-
+			if(cont>1):
+				print("Paquetes necesarios: ",l)
+				continuar=input("¿Continuar con la instalación de los paquetes? s/n: ")
 			else:
-				qjk=os.popen("rpm -qa | grep java-1.8.0-openjdk").read()
-				qje=os.popen("rpm -qa | grep  java-1.8.0-openjdk").read()
-				qm=os.popen("rpm -qa | grep maven").read()
+				print("Paquete necesario: "+l[0])
+				continuar=input("¿Continuar con la instalación? s/n: ")
 
-			obj={}
-			obj["Java - JDK"]= qjk==''
-			obj["Java - JRE"]= qje==''
-			obj["Apache Maven"]= qm==''	#False -> el paquete existe / True -> el paquete no está instalado
-			
-			if(True in obj.values()):
-				l=[]
-				cont=1
-				for i in obj:
-					if(obj[i]):
-						l.append(i)
-						cont+=1
-
-				if(cont>1):
-					print("Paquetes necesarios: ",l)
-					continuar=input("Desea instalar los paquetes necesarios? s/n: ")
-				else:
-					print("Paquete necesario: "+l[0])
-					continuar=input("¿Desea instalar el paquete necesario? s/n: ")
-
+			obj2=[]
+			obj2.append(continuar)
+			if(App.validaPet(obj2)):
 				obj2=[]
-				obj2.append(continuar)
-				if(App.validaPet(obj2)):
-					obj2=[]
-					if(continuar=="s" or continuar==''):
-						preprocesado.javaInstall(qjk,qje)
+				if(continuar=="s" or continuar==''):
+					preprocesado.javaInstall(qjk,qje)
+				
+					if(qm==''):
+						preprocesado.mavenInstall()
 					
-						if(qm==''):
-							preprocesado.mavenInstall()
-						menu=False
-						input("Presiona [ENTER] para continuar.")
-					else:
-						print("Procesado inicial cancelado.")
-						q=input("¿Desea salid del menu preprocesado? s/n: ")
-						if(q=="s" or q==''):
-							menu=False
-
+					input("Presiona [ENTER] para continuar.")
+					return False
 				else:
-					print("Por favor use 's'/'INTRO' o 'n'  para seleccionar la correspondiente acción")
-					print("Volviendo al menu preprocesado ...")
+					print("Procesado inicial cancelado.\n")
+					print("No se puede continuar sin los paquetes "+l)
+					return True
+
 			else:
-				menu=False
+				print("Por favor use 's'/'INTRO' o 'n'  para seleccionar la correspondiente acción.\n")
+				input("Presiona [ENTER] para continuar.")
+				preprocesado.Menu()
+		
+		else:
+			return False
 
 
 	def javaInstall(jdk,jre):
