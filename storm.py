@@ -39,7 +39,6 @@ class Storm():
 			print("4) Iniciar Storm")
 			print("5) Ayuda")
 			print("6) Volver a contramedidas generales")
-			print("7) Salir")
 			print("=========================================")
 			qm=input("Seleccionar una de las opciones: ")
 
