@@ -7,6 +7,7 @@
 
 import os
 import subprocess
+import sys
 from subprocess import Popen,PIPE,STDOUT
 import errno
 import storm
@@ -301,7 +302,7 @@ class contramedidas:
 				ayuda.Menu(ro)
 
 			else:
-				break
+				sys.exit("¡Hasta luego!")
 
 
 	def gestionaContramedidas(cert,kerberos,ranger):
