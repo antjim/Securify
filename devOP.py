@@ -655,37 +655,43 @@ class contramedidas:
 			os.system("clear")
 
 		def compilaRanger():
-			os.system("mkdir dev")
-			os.system("git clone https://github.com/apache/incubator-ranger.git")
-			os.system("mv incubator-ranger dev")
+
 			os.system("bash utilidades/maven.sh")
 
+			def comp(debug):
 
-			os.system("cd dev/incubator-ranger && mvn clean compile package assembly:assembly install")
-			print(" ")
-			input(" Pulse [ENTER] para continuar.")
+				def checkComp():
+					pack=os.popen("ls dev/incubator-ranger/target").read()
+					if("ranger-1.1.0-storm-plugin.tar.gz" in pack):
+						#instala...
+						print(" ")
+						input(" Paquete compilado, pulse [ENTER] para continuar.")
 
-			def comp(debugg):	#REVISAR
-
-				if(debugg):
-				
-					err=os.popen("cd dev/incubator-ranger && mvn clean compile package assembly:assembly install -X").read()
-					
-					if(err==''):
-						q=input("Parece que hubo algún tipo de problema, ¿desea volver a ejecutar en modo depuración? s/n: ")
-
-						if(q=='s' or q==''):
+					else:
+						print(" ")
+						q=input(" Parece que hubo algún tipo de problema, ¿desea volver a intentarlo en modo depuración? s/n: ")
+						print(" ")
+						input(" Pulse [ENTER] para continuar.")
+						if( (q=='s') or (q=='') ):
 							comp(True)
+							
+				try:
+					f=open("dev/incubator-ranger/README.txt")
+					f.close()
+				except:
+					os.system("mkdir dev")
+					os.system("git clone https://github.com/apache/incubator-ranger.git")
+					os.system("mv incubator-ranger dev")
+
+				if(debug):
+					os.system("cd dev/incubator-ranger && mvn clean compile package install assembly:assembly -X")
+					checkComp()
+
 				else:
-					err=os.popen("cd dev/incubator-ranger && mvn clean compile package assembly:assembly install").read()
+					os.system("cd dev/incubator-ranger && mvn clean compile package install assembly:assembly")
+					checkComp()		
 
-					if(err==''):
-						q=input("Parece que hubo algún tipo de problema, ¿desea volver a ejecutar en modo depuración? s/n: ")
-
-						if(q=='s' or q==''):
-							comp(True)
-
-			#comp(False)
+			comp(False)
 
 
 		entorno=App.System()
