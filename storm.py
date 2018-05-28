@@ -5,6 +5,12 @@
 #autor: Antonio J.|
 #-----------------|
 
+__author__ = "Antonio J."
+__license__ = "GPL"
+__version__ = "1.0.0"
+__web__ = "https://github.com/antjim"
+__status__ = "Production"
+
 import os
 import subprocess
 from subprocess import Popen,PIPE,STDOUT
@@ -163,53 +169,6 @@ class Storm():
 		os.system(cd)
 		os.system(cd2)
 		input("El sistema puede tardar 1 minuto aproximádamente en estar listo. Pulsa [Enter] para continuar.")
-
-	def generaLineas(alm,rs):
-
-		path=rs+"/conf/storm.yaml"
-		cd="rm "+rs+"/conf/storm.yaml"
-		cd2="mv "+rs+"/conf/storm.yaml.new "+rs+"/conf/storm.yaml"
-
-		f=open(path)
-		lineaf=f.readlines()
-		f.close()
-
-		f=open(path)
-		g=open(rs+"/conf/storm.yaml.new","w")
-		linea=f.readline()
-
-		for objeto in alm:	#solo habrá una iteración - uso de python3 impide coger directamente con keys()
-			cant=len(alm[objeto])
-			work=False
-			cont=False
-
-			while(linea != lineaf[-1]):
-
-				if(objeto in linea):
-					work=True
-
-				if(work):
-					cont==True
-					if((linea=="# \n") or (linea==" \n")):
-						for j in range(cant):
-							g.write("\n")
-						linea=f.readline()
-					else:
-						g.write(linea)
-						linea=f.readline()
-				
-				if(cont==False):
-					g.write(linea)
-					linea=f.readline()
-
-			g.write(linea)
-
-			#input("HECHO")
-			f.close()
-			g.close()
-			#input("PAUSA")
-			os.system(cd)				
-			os.system(cd2)
 
 
 	def logo():
@@ -418,15 +377,9 @@ class Integridad:	#opciones de integridad para Storm
 
 class AtoAte:	#opciones para mejorar Autorización y Autenticación
 
-	def Kerberos(rs,rz):	#COOKING
+	def Kerberos(rs,rz):
 		
 		devOP.contramedidas.Kerberos()	#realiza la preconfiguración e instalación
-
-		# *** hay que crear usuarios y exportar los keytabs
-		#print("Por favor ingresa a continuación lo siguiente: addprinc root/admin")
-		#print("Después pulsa la tecla 'q' para salir.")
-		#input("Pulsar [ENTER] para continuar.")
-		#os.system("kadmin.local")
 
 		os.system("clear")
 
@@ -529,10 +482,8 @@ class AtoAte:	#opciones para mejorar Autorización y Autenticación
 		'supervisor.childopts: "-Xmx256m -Djava.security.auth.login.config='+rs+'/conf/storm_jaas.conf"',
 		'ui.childopts: "-Xmx768m -Djava.security.auth.login.config='+rz+'/conf/storm_jaas.conf"']
 
-		#Storm.generaLineas(d2,rs)
 		Storm.confStorm(d2,rs)
 
-		#Storm.generaLineas(d3,rs)
 		Storm.confStorm(d3,rs)
 
 

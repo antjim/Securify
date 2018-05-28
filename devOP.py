@@ -5,6 +5,12 @@
 #autor: Antonio J.|
 #-----------------|
 
+__author__ = "Antonio J."
+__license__ = "GPL"
+__version__ = "1.0.0"
+__web__ = "https://github.com/antjim"
+__status__ = "Production"
+
 import os
 import subprocess
 import sys
@@ -319,7 +325,6 @@ class contramedidas:
 		if(ranger == "s" or ranger==''):
 			print("Instalando Apache Ranger ")
 			contramedidas.Ranger()
-			#print("[OK] Instalación de Apacha Ranger finalizada")
 
 
 	def Certificados():
@@ -399,8 +404,6 @@ class contramedidas:
 
 			f=open("/etc/krb5.conf")
 			linea=f.readline()
-
-			#input("ANTES DE PROCESAR")
 			
 			while(linea!=lineaf[-1]):
 				
@@ -478,11 +481,6 @@ class contramedidas:
 
 			os.system("rm /var/kerberos/krb5kdc/kdc.conf")
 			os.system("mv /var/kerberos/krb5kdc/kdc.conf.new /var/kerberos/krb5kdc/kdc.conf")
-
-			#op="kadmin -q 'addprinc -randkey root/admin@'"+reino
-			#os.system(op)
-
-			#input("STOP")
 
 			os.system("systemctl start krb5kdc kadmin")
 			os.system("systemctl start kadmin.service")
@@ -705,8 +703,6 @@ class contramedidas:
 		print("COMPILANDO APACHE RANGER")
 
 		compilaRanger()
-
-		#print("INSTALANDO RANGER")
 
 
 	def gestionIntegridad():
