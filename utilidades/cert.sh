@@ -20,10 +20,11 @@ ALIAS="localhost"
 fi
 
 echo " ---------- "
-
-echo "Clave para el certificado (CUIDADO CON LAS CLAVES QUE SE SOLICITEN EN LA CREACIÓN DEL CERTIFICADO): "
-read "CLAVE"
-
+CLAVE="a"
+while [  ${#CLAVE} -le 7 ]; do
+             echo "Clave para el certificado debe ser como mínimo de longitud 8 (CUIDADO CON LAS CLAVES QUE SE SOLICITEN EN LA CREACIÓN DEL CERTIFICADO): "
+			 read "CLAVE"
+         done
 echo " ---------- "
 
 echo "Duración en días del certificado (intro para establecer por defecto como 365 días): "
