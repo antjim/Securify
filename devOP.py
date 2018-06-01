@@ -315,12 +315,16 @@ class contramedidas:
 		if(cert == "s" or cert==''):
 			print("Generando certificados")
 			contramedidas.Certificados()
-			print("[OK] Generación de certificados finalizada")
-		
+			print(" ")
+			input("[OK] Generación de certificados finalizada")
+			input("[ENTER] para continuar")
+
 		if(kerberos == "s" or kerberos==''):
 			print("Instalando Kerberos "+"\n")
 			contramedidas.Kerberos()
+			print(" ")
 			print("[OK] Instalación del servidor Kerberos finalizada.")
+			input("[ENTER] para continuar")
 
 		if(ranger == "s" or ranger==''):
 			print("Instalando Apache Ranger ")
