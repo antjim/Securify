@@ -347,7 +347,7 @@ class Integridad:	#opciones de integridad para Storm
 		if(existe==''):
 			devOP.contramedidas.Certificados()
 
-		os.system(" ========= ")
+		print(" ========= ")
 		input("Creación de certificados finalizado, pulsa [ENTER] para continuar."+"\n")
 
 		claveAlm=input("Introduzca la clave usada para el almacén de certificados: ")
