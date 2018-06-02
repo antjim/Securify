@@ -143,7 +143,7 @@ class Storm():
 
 			f.close()
 			g.close()
-
+			
 			os.system(cd)
 			os.system(cd2)
 
@@ -456,7 +456,7 @@ class AtoAte:	#opciones para mejorar Autorización y Autenticación
 		#modificación fichero zookeeper zoo.cnf - agregando Kerberos
 
 		d={}
-		d['autopurge.purgeInterval=']=["authProvider.1 = org.apache.zookeeper.server.auth.SASLAuthenticationProvider",
+		d['clientPort=']=["authProvider.1 = org.apache.zookeeper.server.auth.SASLAuthenticationProvider",
 		"-Djava.security.auth.login.config="+rz+"/zk_jaas.conf",
 		"kerberos.removeHostFromPrincipal = true",
 		"kerberos.removeRealmFromPrincipal = true",
