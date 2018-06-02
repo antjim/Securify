@@ -414,8 +414,8 @@ class AtoAte:	#opciones para mejorar Autorización y Autenticación
 		f.write("}; \n")
 
 		f.write("StormClient { \n")
-		f.write("	com.sun.security.auth.module.Krb5LoginModule required")
-		f.write("	useKeyTab=true")
+		f.write("	com.sun.security.auth.module.Krb5LoginModule required \n")
+		f.write("	useKeyTab=true \n")
 		f.write('	keyTab="'+dr+'/storm.keytab" \n')	
 		f.write("	storeKey=true \n")
 		f.write("	useTicketCache=false \n")
