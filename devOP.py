@@ -374,7 +374,7 @@ class contramedidas:
 						return 3
 
 				except OSError:
-					print("[Error] Sistema operativo soportado para Debian, derivados y CentOS")
+					input("[Error] Sistema operativo soportado para Debian, derivados y CentOS. [ENTER] para continuar.")
 		
 
 		#configuración ...
@@ -408,8 +408,12 @@ class contramedidas:
 
 			f=open("/etc/krb5.conf")
 			linea=f.readline()
+
+			cont=-1
+			while(lineaf[cont]=='\n'):
+				cont=cont-1
 			
-			while(linea!=lineaf[-1]):
+			while(linea!=lineaf[cont]):
 				
 				work=False
 
@@ -511,7 +515,11 @@ class contramedidas:
 			f=open("/etc/krb5.conf","r")
 			linea=f.readline()
 
-			while(linea!=lineaf[-1]):
+			cont=-1
+			while(lineaf[cont]=='\n'):
+				cont=cont-1
+
+			while(linea!=lineaf[cont]):
 
 				work=False
 
